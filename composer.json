@@ -1,0 +1,41 @@
+{
+    "name": "padosoft/laravel-affiliate-network",
+    "description": "agnostic helpers to use as foundation in packages and other project",
+    "keywords": [
+        "padosoft",
+        "affiliate",
+		"network",
+		"wrapper"
+    ],
+    "homepage": "https://github.com/padosoft/laravel-affiliate-network",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lorenzo Padovani",
+            "email": "helpdesk@padosoft.com",
+            "homepage": "https://www.padosoft.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=7.0.0",
+        "illuminate/support": "^5.0",
+        "padosoft/support": "^1.12"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Padosoft\\AffiliateNetwork\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Padosoft\\AffiliateNetwork\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
