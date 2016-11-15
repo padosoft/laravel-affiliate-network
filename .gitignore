@@ -23,12 +23,10 @@ vendor
 *.sto
 *.stl
 *.env
-*.idea
 phinx.yml
 node_modules
 Homestead.yaml
 Homestead.json
 composer.phar
 composer.lock
-.DS_Store
 analyticstracking.php
