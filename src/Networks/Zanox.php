@@ -12,6 +12,45 @@ use Padosoft\AffiliateNetwork\NetworkInterface;
 class Zanox extends AbstractNetwork implements NetworkInterface
 {
     /**
+     * @var object
+     */
+    private $_network = null;
+
+    /**
+     * @method __construct
+     */
+    public function __construct(string $username, string $password)
+    {
+        $this->_network = new \Oara\Network\Publisher\Zanox;
+        $this->username = $username;
+        $this->password = $password;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkLogin() : bool
+    {
+        $credentials = array();
+        $credentials["connectid"] = $this->username;
+        $credentials["secretkey"] = $this->password;
+        $this->_network->login($credentials);
+        if ($this->_network->checkConnection()) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * @return array of Merchants
+     */
+    public function getMerchants() : array
+    {
+        return $this->_network->getMerchantList();
+    }
+
+    /**
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param int $merchantID
