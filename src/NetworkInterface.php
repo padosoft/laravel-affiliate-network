@@ -22,7 +22,7 @@ interface NetworkInterface
      * @param int $merchantID
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array;
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array;
 
     /**
      * @param \DateTime $dateFrom
