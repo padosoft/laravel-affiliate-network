@@ -42,4 +42,46 @@ class Deal
      * @var \DateTime
      */
     public $endDate;
+
+    /**
+     * @var integer
+     */
+    public $deal_ID = 0;
+
+    /**
+     * @var string
+     */
+    public $name = '';
+
+    /**
+     * @var string
+     */
+    public $deal_type = '';
+
+    /**
+     * @var string
+     */
+    public $ppv = '';
+
+    /**
+     * @var string
+     */
+    public $ppc = '';
+
+    /**
+     * @method createInstance
+     * @return obj istance
+     */
+    public static function createInstance()
+    {
+        $obj = null;
+        try {
+            $obj = new Deal();
+        } catch (\Exception $e) {
+            throw new \Exception('Error creating instance Deal - ' . $e->getMessage());
+        }
+        return $obj;
+    }
+
+
 }

@@ -9,12 +9,10 @@ namespace Padosoft\AffiliateNetwork;
 interface NetworkInterface
 {
     /**
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array;
+    public function getDeals(int $merchantID = 0) : array;
 
     /**
      * @param \DateTime $dateFrom

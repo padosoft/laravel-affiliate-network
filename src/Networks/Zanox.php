@@ -4,6 +4,8 @@ namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Transaction;
 use Padosoft\AffiliateNetwork\Merchant;
+use Padosoft\AffiliateNetwork\Stat;
+use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 
@@ -68,14 +70,35 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
+    public function getDeals(int $merchantID = 0) : array
     {
-        // TODO: Implement getDeals() method.
+        $this->_apiClient->setConnectId($this->_username);
+        $this->_apiClient->setSecretKey($this->_password);
+        $arrResponse = json_decode($this->_apiClient->getAdmedia(), true);
+        $arrAdmediumItems = $arrResponse['admediumItems']['admediumItem'];
+        $arrResult = array();
+        foreach($arrAdmediumItems as $admediumItems) {
+            $Deal = Deal::createInstance();
+            $Deal->deal_ID = (int)$admediumItems['@id'];
+            $Deal->name = $admediumItems['name'];
+            $Deal->deal_type = $admediumItems['admediumType'];
+            $Deal->merchant_ID = (int)$admediumItems['program']['@id'];
+            $Deal->ppv = $admediumItems['trackingLinks']['trackingLink'][0]['ppv'];
+            $Deal->ppc = $admediumItems['trackingLinks']['trackingLink'][0]['ppc'];
+            if($merchantID > 0) {
+                if($merchantID == $admediumItems['program']['@id']) {
+                    $arrResult[] = $Deal;
+                }
+            }
+            else {
+                $arrResult[] = $Deal;
+            }
+        }
+
+        return $arrResult;
     }
 
     /**
@@ -115,12 +138,20 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
+        return array();
+
+        /*
         $this->_apiClient->setConnectId($this->_username);
         $this->_apiClient->setSecretKey($this->_password);
         $dateFromIsoEngFormat = $dateFrom->format('Y-m-d');
         $dateToIsoEngFormat = $dateTo->format('Y-m-d');
         $response = $this->_apiClient->getReportBasic($dateFromIsoEngFormat, $dateToIsoEngFormat);
+        $arrResponse = json_decode($response, true);
+        $reportItems = $arrResponse['reportItems'];
+        $Stat = Stat::createInstance();
+        $Stat->reportItems = $reportItems;
 
-        return json_decode($response, true);
+        return array($Stat);
+        */
     }
 }

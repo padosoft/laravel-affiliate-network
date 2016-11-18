@@ -58,6 +58,12 @@ class Transaction
      */
     public $approved = false;
 
+    /**     
+     * @var array
+     */
+    public $reportItems = array();
+
+
     /**
      * @method createInstance
      * @return obj istance
