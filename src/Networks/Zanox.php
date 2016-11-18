@@ -3,6 +3,7 @@
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Transaction;
+use Padosoft\AffiliateNetwork\Merchant;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 
@@ -54,7 +55,16 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function getMerchants() : array
     {
-        return $this->_network->getMerchantList();
+        $arrResult = array();
+        $merchantList = $this->_network->getMerchantList();
+        foreach($merchantList as $merchant) {
+            $Merchant = Merchant::createInstance();
+            $Merchant->merchant_ID = $merchant['cid'];
+            $Merchant->name = $merchant['name'];
+            $arrResult[] = $Merchant;
+        }
+
+        return $arrResult;
     }
 
     /**
