@@ -9,13 +9,11 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 
-// require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/Zanox/Zapi/ApiClient.php";
-
 /**
- * Class Zanox
+ * Class TradeDoubler
  * @package Padosoft\AffiliateNetwork\Networks
  */
-class Zanox extends AbstractNetwork implements NetworkInterface
+class TradeDoubler extends AbstractNetwork implements NetworkInterface
 {
     /**
      * @var object
@@ -30,10 +28,10 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function __construct(string $username, string $password)
     {
-        $this->_network = new \Oara\Network\Publisher\Zanox;
+        $this->_network = new \Oara\Network\Publisher\TradeDoubler;
         $this->_username = $username;
         $this->_password = $password;
-        $this->_apiClient = \ApiClient::factory(PROTOCOL_JSON);
+        $this->_apiClient = null;
     }
 
     /**
@@ -42,8 +40,8 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     public function checkLogin() : bool
     {
         $credentials = array();
-        $credentials["connectid"] = $this->_username;
-        $credentials["secretkey"] = $this->_password;
+        $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_password;
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
             return true;
@@ -75,21 +73,28 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals(int $merchantID = 0) : array
     {
-        $this->_apiClient->setConnectId($this->_username);
-        $this->_apiClient->setSecretKey($this->_password);
-        $arrResponse = json_decode($this->_apiClient->getAdmedia(), true);
-        $arrAdmediumItems = $arrResponse['admediumItems']['admediumItem'];
         $arrResult = array();
-        foreach($arrAdmediumItems as $admediumItems) {
+        $jsonVouchers = file_get_contents("https://api.tradedoubler.com/1.0/vouchers.json;voucherTypeId=1?token=".$_ENV['TRADEDOUBLER_TOKEN']);
+        $arrVouchers = json_decode($jsonVouchers, true);
+
+        foreach($arrVouchers as $vouchers) {
             $Deal = Deal::createInstance();
-            $Deal->deal_ID = (int)$admediumItems['@id'];
-            $Deal->name = $admediumItems['name'];
-            $Deal->deal_type = $admediumItems['admediumType'];
-            $Deal->merchant_ID = (int)$admediumItems['program']['@id'];
-            $Deal->ppv = $admediumItems['trackingLinks']['trackingLink'][0]['ppv'];
-            $Deal->ppc = $admediumItems['trackingLinks']['trackingLink'][0]['ppc'];
+            $Deal->deal_ID = $vouchers['id'];
+            $Deal->merchant_ID = $vouchers['programId'];
+            $Deal->merchant_name = $vouchers['programName'];
+            $Deal->code = $vouchers['code'];
+            $Deal->name = $vouchers['title'];
+            $Deal->short_description = $vouchers['shortDescription'];
+            $Deal->description = $vouchers['description'];
+            $Deal->deal_type = $vouchers['voucherTypeId'];
+            $Deal->default_track_uri = $vouchers['defaultTrackUri'];
+            $Deal->default_track_uri = $vouchers['landingUrl'];
+            $Deal->discount_amount = $vouchers['discountAmount'];
+            $Deal->is_percentage = $vouchers['isPercentage'];
+            $Deal->currency_initial = $vouchers['currencyId'];
+            $Deal->logo_path = $vouchers['logoPath'];
             if($merchantID > 0) {
-                if($merchantID == $admediumItems['program']['@id']) {
+                if($vouchers['programId'] == $merchantID) {
                     $arrResult[] = $Deal;
                 }
             }
@@ -107,23 +112,20 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchant = array()) : array
     {
         $arrResult = array();
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+        $transcationList = $this->_network->getTransactionList($arrMerchant, $dateFrom, $dateTo);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
-            $Transaction->currency = $transaction['currency'];
-            $Transaction->status = $transaction['status'];
-            $Transaction->amount = $transaction['amount'];
-            $Transaction->custom_ID = $transaction['custom_id'];
-            $Transaction->title = $transaction['title'];
-            $Transaction->unique_ID = $transaction['unique_id'];
-            $Transaction->commission = $transaction['commission'];
+            $Transaction->merchant_ID = $transaction['merchantId'];
             $date = new \DateTime($transaction['date']);
             $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-            $Transaction->merchant_ID = $transaction['merchantId'];
-            $Transaction->approved = $transaction['approved'];
+            $Transaction->unique_ID = $transaction['unique_id'];
+            $Transaction->custom_ID = $transaction['custom_id'];
+            $Transaction->status = $transaction['status'];
+            $Transaction->amount = $transaction['amount'];
+            $Transaction->commission = $transaction['commission'];
             $arrResult[] = $Transaction;
         }
 
@@ -138,19 +140,6 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
-        return array();
-        /*
-        $this->_apiClient->setConnectId($this->_username);
-        $this->_apiClient->setSecretKey($this->_password);
-        $dateFromIsoEngFormat = $dateFrom->format('Y-m-d');
-        $dateToIsoEngFormat = $dateTo->format('Y-m-d');
-        $response = $this->_apiClient->getReportBasic($dateFromIsoEngFormat, $dateToIsoEngFormat);
-        $arrResponse = json_decode($response, true);
-        $reportItems = $arrResponse['reportItems'];
-        $Stat = Stat::createInstance();
-        $Stat->reportItems = $reportItems;
-
-        return array($Stat);
-        */
+        return array();        
     }
 }
