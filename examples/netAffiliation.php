@@ -53,13 +53,12 @@ if($isLogged) {
     var_dump($deals);
     echo '</pre>';
 
-    /*
     echo '<h1>Single deal merchant id = 7853</h1>';
     $deals = $NetAffiliation->getDeals(7853);
     echo '<pre>';
     var_dump($deals);
     echo '</pre>';
-    */
+
 
 
 }
