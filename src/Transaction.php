@@ -58,11 +58,35 @@ class Transaction
      */
     public $approved = false;
 
-    /**     
+    /**
      * @var array
      */
     public $reportItems = array();
 
+    /**
+     * @var string
+     */
+    public $transaction_ID = '';
+
+    /**
+     * @var integer
+     */
+    public $affiliate_ID = 0;
+
+    /**
+     * @var string
+     */
+    public $campaign_name = '';
+
+    /**
+     * @var string
+     */
+    public $program_name = '';
+
+    /**
+     * @var string
+     */
+    public $referrer = '';
 
     /**
      * @method createInstance
