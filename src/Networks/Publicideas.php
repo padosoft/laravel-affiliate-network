@@ -23,15 +23,19 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
     private $_network = null;
     private $_username = '';
     private $_password = '';
+    private $_token = '';
+    private $_partner_id = '';
 
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password)
+    public function __construct(string $username, string $password, string $token, string $partner_id)
     {
         $this->_network = new \Oara\Network\Publisher\Publicidees;
         $this->_username = $username;
         $this->_password = $password;
+        $this->_token = $token;
+        $this->_partner_id = $partner_id;
     }
 
     /**
@@ -43,6 +47,9 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
         $this->_network->login($credentials);
+
+        var_dump($this->_network->checkConnection());
+
         if ($this->_network->checkConnection()) {
             return true;
         }
@@ -73,6 +80,36 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals(int $merchantID = 0) : array
     {
+        $url = 'http://publisher.publicideas.com/xmlProgAff.php?partid='.$this->_partner_id.'&key='.$this->_token.'&noDownload=yes';
+        $xml = file_get_contents($url);
+        $arrResult = array();
+        $arrResponse = xml2array($xml);
+        if(!is_array($arrResponse) || count($arrResponse) <= 0) {
+            return $arrResult;
+        }
+        $arrPartner = $arrResponse['partner'];
+        echo '<pre>';
+        var_dump($arrPartner);
+        echo '</pre>';
+
+        /*
+        foreach($arrPartner as $partner) {
+            $Deal = Deal::createInstance();
+            $Deal->program_name;
+            if($merchantID > 0) {
+                if($merchantID == $admediumItems['program']['@id']) {
+                    $arrResult[] = $Deal;
+                }
+            }
+            else {
+                $arrResult[] = $Deal;
+            }
+        }
+        */
+
+
+
+        /*
         $this->_apiClient->setConnectId($this->_username);
         $this->_apiClient->setSecretKey($this->_password);
         $arrResponse = json_decode($this->_apiClient->getAdmedia(), true);
@@ -97,6 +134,10 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
         }
 
         return $arrResult;
+        */
+
+       return array();
+
     }
 
     /**
