@@ -32,10 +32,10 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->share('alert', function (NetworkInterface $network) {
+        $this->app['NetworkManager']=$this->app->share(function (NetworkInterface $network) {
             return new NetworkManager($network);
         });
-        $this->app->alias('networkmanager', NetworkManager::class);
+        $this->app->alias('NetworkManager', NetworkManager::class);
     }
 
     /**
@@ -46,7 +46,7 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'networkmanager',
+            'NetworkManager',
         ];
     }
 }
