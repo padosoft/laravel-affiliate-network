@@ -1,5 +1,4 @@
 build
-composer.lock
 docs
 vendor
 tests/Integration/temp
@@ -28,5 +27,4 @@ node_modules
 Homestead.yaml
 Homestead.json
 composer.phar
-composer.lock
 analyticstracking.php
