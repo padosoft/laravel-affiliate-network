@@ -35,7 +35,7 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app['ZanoxNetwork']=$this->app->share(function ($app) {
-            return new ZanoxEx('','');
+            return new Zanox('','');
         });
         $this->app['ZanoxNetworkManager']=$this->app->share(function ($app) {
             return new NetworkManager($app['ZanoxNetwork']);
