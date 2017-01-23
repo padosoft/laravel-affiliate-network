@@ -3,6 +3,7 @@
 namespace Padosoft\AffiliateNetwork;
 
 use Illuminate\Support\ServiceProvider;
+use Padosoft\AffiliateNetwork\Networks\Zanox;
 
 class AffiliateNetworkServiceProvider extends ServiceProvider
 {
@@ -32,7 +33,10 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app['NetworkManager']=$this->app->share(function (NetworkInterface $network) {
+        $this->app['Zanox']=$this->app->share(function ($app) {
+            return new Zanox('','');
+        });
+        $this->app['ZanoxNetworkManager']=$this->app->share(function ($app) {
             return new NetworkManager($network);
         });
         $this->app->alias('NetworkManager', NetworkManager::class);

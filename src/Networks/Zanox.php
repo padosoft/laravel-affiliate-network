@@ -20,12 +20,11 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     /**
      * @var object
      */
-    private $_network = null;
-    private $_apiClient = null;
-    private $_username = '';
-    private $_password = '';
-    private $_logged = false;
-
+    private $_network   = null;
+    protected $_apiClient = null;
+    private $_username  = '';
+    private $_password  = '';
+    private $_logged    = false;
 
 
     /**
@@ -36,22 +35,36 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         $this->_network = new \Oara\Network\Publisher\Zanox;
         $this->_username = $username;
         $this->_password = $password;
+        $this->login( $this->username, $this->password );
+
+    }
+
+    public function login(string $username, string $password): bool
+    {
+        $this->_logged = false;
+        if (!isNotNullOrEmpty( $this->username ) && !isNotNullOrEmpty( $this->password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
         $credentials = array();
         $credentials["connectid"] = $this->_username;
         $credentials["secretkey"] = $this->_password;
-        $this->_network->login($credentials);
-        $this->_apiClient = $this->invokeProperty($this->_network,'_apiClient');
+        $this->_network->login( $credentials );
+        $this->_apiClient = $this->invokeProperty( $this->_network, '_apiClient' );
         if ($this->_network->checkConnection()) {
-            $this->_logged=true;
+            $this->_logged = true;
 
         }
 
+        return $this->_logged;
     }
 
     /**
      * @return bool
      */
-    public function checkLogin() : bool
+    public function checkLogin(): bool
     {
         return $this->_logged;
     }
@@ -59,14 +72,14 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     /**
      * @return array of Merchants
      */
-    public function getMerchants() : array
+    public function getMerchants(): array
     {
-        if (!$this->checkLogin()){
+        if (!$this->checkLogin()) {
             return array();
         }
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
-        foreach($merchantList as $merchant) {
+        foreach ($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
@@ -78,19 +91,20 @@ class Zanox extends AbstractNetwork implements NetworkInterface
 
     /**
      * @param int $merchantID
+     *
      * @return array of Deal
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals(int $merchantID = 0): array
     {
-        if (!$this->checkLogin()){
+        if (!$this->checkLogin()) {
             return array();
         }
-        $this->_apiClient->setConnectId($this->_username);
-        $this->_apiClient->setSecretKey($this->_password);
-        $arrResponse = json_decode($this->_apiClient->getAdmedia(), true);
+        $this->_apiClient->setConnectId( $this->_username );
+        $this->_apiClient->setSecretKey( $this->_password );
+        $arrResponse = json_decode( $this->_apiClient->getAdmedia(), true );
         $arrAdmediumItems = $arrResponse['admediumItems']['admediumItem'];
         $arrResult = array();
-        foreach($arrAdmediumItems as $admediumItems) {
+        foreach ($arrAdmediumItems as $admediumItems) {
             $Deal = Deal::createInstance();
             $Deal->deal_ID = (int)$admediumItems['@id'];
             $Deal->name = $admediumItems['name'];
@@ -98,12 +112,11 @@ class Zanox extends AbstractNetwork implements NetworkInterface
             $Deal->merchant_ID = (int)$admediumItems['program']['@id'];
             $Deal->ppv = $admediumItems['trackingLinks']['trackingLink'][0]['ppv'];
             $Deal->ppc = $admediumItems['trackingLinks']['trackingLink'][0]['ppc'];
-            if($merchantID > 0) {
-                if($merchantID == $admediumItems['program']['@id']) {
+            if ($merchantID > 0) {
+                if ($merchantID == $admediumItems['program']['@id']) {
                     $arrResult[] = $Deal;
                 }
-            }
-            else {
+            } else {
                 $arrResult[] = $Deal;
             }
         }
@@ -112,39 +125,48 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     }
 
 
-
     /**
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param int $merchantID
+     *
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
     {
-        if (!$this->checkLogin()){
+        if (!$this->checkLogin()) {
             return array();
         }
         $arrResult = array();
-        if (count($arrMerchantID)<1){
-            $merchants=$this->getMerchants();
-            foreach ($merchants as $merchant){
-                $arrMerchantID[$merchant->merchant_ID]=['cid'=>$merchant->merchant_ID,'name'=>$merchant->name];
+        if (count( $arrMerchantID ) < 1) {
+            $merchants = $this->getMerchants();
+            foreach ($merchants as $merchant) {
+                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
-        foreach($transcationList as $transaction) {
+        $transcationList = $this->_network->getTransactionList( $arrMerchantID, $dateTo, $dateFrom );
+        foreach ($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
-            array_key_exists_safe($transaction,'currency')?$Transaction->currency = $transaction['currency']:$Transaction->currency = '';
-            array_key_exists_safe($transaction,'status')?$Transaction->status = $transaction['status']:$Transaction->status = '';
-            array_key_exists_safe($transaction,'amount')?$Transaction->amount = $transaction['amount']:$Transaction->amount = '';
-            array_key_exists_safe($transaction,'custom_id')?$Transaction->custom_ID = $transaction['custom_id']:$Transaction->custom_ID = '';
-            array_key_exists_safe($transaction,'title')? $Transaction->title = $transaction['title']:$Transaction->title = '';
-            array_key_exists_safe($transaction,'unique_id')?$Transaction->unique_ID = $transaction['unique_id']:$Transaction->unique_ID = '';
-            array_key_exists_safe($transaction,'commission')?$Transaction->commission = $transaction['commission']:$Transaction->commission = '';
-            $date = new \DateTime($transaction['date']);
+            array_key_exists_safe( $transaction,
+                'currency' ) ? $Transaction->currency = $transaction['currency'] : $Transaction->currency = '';
+            array_key_exists_safe( $transaction,
+                'status' ) ? $Transaction->status = $transaction['status'] : $Transaction->status = '';
+            array_key_exists_safe( $transaction,
+                'amount' ) ? $Transaction->amount = $transaction['amount'] : $Transaction->amount = '';
+            array_key_exists_safe( $transaction,
+                'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
+            array_key_exists_safe( $transaction,
+                'title' ) ? $Transaction->title = $transaction['title'] : $Transaction->title = '';
+            array_key_exists_safe( $transaction,
+                'unique_id' ) ? $Transaction->unique_ID = $transaction['unique_id'] : $Transaction->unique_ID = '';
+            array_key_exists_safe( $transaction,
+                'commission' ) ? $Transaction->commission = $transaction['commission'] : $Transaction->commission = '';
+            $date = new \DateTime( $transaction['date'] );
             $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-            array_key_exists_safe($transaction,'merchantId')?$Transaction->merchant_ID = $transaction['merchantId']:$Transaction->merchant_ID = '';
-            array_key_exists_safe($transaction,'approved')?$Transaction->approved = $transaction['approved']:$Transaction->approved = '';
+            array_key_exists_safe( $transaction,
+                'merchantId' ) ? $Transaction->merchant_ID = $transaction['merchantId'] : $Transaction->merchant_ID = '';
+            array_key_exists_safe( $transaction,
+                'approved' ) ? $Transaction->approved = $transaction['approved'] : $Transaction->approved = '';
             $arrResult[] = $Transaction;
         }
 
@@ -155,9 +177,10 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param int $merchantID
+     *
      * @return array of Stat
      */
-    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
+    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0): array
     {
         return array();
         /*
