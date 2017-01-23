@@ -17,12 +17,18 @@
             "role": "Developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/padosoft/php-oara"
+        }
+    ],
     "require": {
         "php" : ">=7.0.0",
         "illuminate/support": "^5.0",
         "padosoft/support": "^1.12",
-        "fubralimited/php-oara": "^2.0",
-        "vlucas/phpdotenv": "^2.4"
+        "vlucas/phpdotenv": "^2.4",
+        "padosoft/php-oara": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.0"
