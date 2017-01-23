@@ -32,7 +32,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      */
     public function __construct(string $username, string $password)
     {
-        $this->_network = new \Oara\Network\Publisher\Zanox;
+        $this->_network = new ZanoxEx;
         $this->_username = $username;
         $this->_password = $password;
         $this->login( $this->username, $this->password );
