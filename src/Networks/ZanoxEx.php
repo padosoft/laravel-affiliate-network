@@ -5,9 +5,9 @@
 
 
 namespace Padosoft\AffiliateNetwork\Networks;
-use Oara\Network\Publisher\Zanox;
+use Oara\Network\Publisher\Zanox as ZanoxOara;
 
-class ZanoxEx extends Zanox
+class ZanoxEx extends ZanoxOara
 {
     /**
      * Call protected/private method of a class.
@@ -49,11 +49,11 @@ class ZanoxEx extends Zanox
      *
      * @return array
      */
-    private function getSales($date, $page, $pageSize, $iteration = 0)
+    protected function getSales($date, $page, $pageSize, $iteration = 0)
     {
         $transactionList = array();
         try {
-            $transactionList = $this->invokeProperty( $this, '_apiClient' )->getSales($date, 'modifiedDate', null, null, null, $page, $pageSize, $iteration);
+            $transactionList = $this->_apiClient->getSales($date, 'modifiedDate', null, null, null, $page, $pageSize, $iteration);
         } catch (\Exception $e) {
             $iteration++;
             if ($iteration < 5) {
@@ -63,5 +63,9 @@ class ZanoxEx extends Zanox
         }
         return $transactionList;
 
+    }
+
+    public function getApiClient(){
+        return $this->_apiClient;
     }
 }
