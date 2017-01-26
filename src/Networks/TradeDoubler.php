@@ -3,12 +3,13 @@
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Transaction;
+use Padosoft\AffiliateNetwork\DealsResultset;
 use Padosoft\AffiliateNetwork\Merchant;
 use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
-
+define('COOKIES_BASE_DIR',public_path('upload/report'));
 /**
  * Class TradeDoubler
  * @package Padosoft\AffiliateNetwork\Networks
@@ -22,16 +23,40 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     private $_apiClient = null;
     private $_username = '';
     private $_password = '';
+    private $_logged    = false;
 
     /**
      * @method __construct
      */
     public function __construct(string $username, string $password)
     {
-        $this->_network = new \Oara\Network\Publisher\TradeDoubler;
+        $this->_network = new TradeDoublerEx;
         $this->_username = $username;
         $this->_password = $password;
         $this->_apiClient = null;
+        $this->login( $this->_username, $this->_password );
+    }
+
+    public function login(string $username, string $password): bool
+    {
+        $this->_logged = false;
+        if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
+        $credentials = array();
+        $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_password;
+        $this->_network->login( $credentials );
+
+        if ($this->_network->checkConnection()) {
+            $this->_logged = true;
+
+        }
+
+        return $this->_logged;
     }
 
     /**
@@ -39,15 +64,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        $credentials = array();
-        $credentials["user"] = $this->_username;
-        $credentials["password"] = $this->_password;
-        $this->_network->login($credentials);
-        if ($this->_network->checkConnection()) {
-            return true;
-        }
-
-        return false;
+        return $this->_logged;;
     }
 
     /**
@@ -55,6 +72,9 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
      */
     public function getMerchants() : array
     {
+        if (!$this->checkLogin()) {
+            return array();
+        }
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
@@ -68,11 +88,21 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-     * @param int $merchantID
-     * @return array of Deal
+     * @param int|null $merchantID
+     * @param int $page
+     * @param int $items_per_page
+     *
+     * @return DealsResultset
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals($merchantID,int $page=0,int $items_per_page=10) : DealsResultset
     {
+        if (!isIntegerPositive($items_per_page)){
+            $items_per_page=10;
+        }
+        $result=DealsResultset::createInstance();
+        if (!$this->checkLogin()) {
+            return $result;
+        }
         $arrResult = array();
         $jsonVouchers = file_get_contents("https://api.tradedoubler.com/1.0/vouchers.json;voucherTypeId=1?token=".$_ENV['TRADEDOUBLER_TOKEN']);
         $arrVouchers = json_decode($jsonVouchers, true);
@@ -102,8 +132,8 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
                 $arrResult[] = $Deal;
             }
         }
-
-        return $arrResult;
+        $result->deals[]=$arrResult;
+        return $result;
     }
 
     /**
@@ -112,10 +142,19 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchant = array()) : array
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
+        if (!$this->checkLogin()) {
+            return array();
+        }
         $arrResult = array();
-        $transcationList = $this->_network->getTransactionList($arrMerchant, $dateFrom, $dateTo);
+        if (count( $arrMerchantID ) < 1) {
+            $merchants = $this->getMerchants();
+            foreach ($merchants as $merchant) {
+                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+            }
+        }
+        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->merchant_ID = $transaction['merchantId'];

@@ -186,6 +186,9 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         if (!$this->checkLogin()) {
             return array();
         }
+        if ($dateTo->format('Y-m-d')==$dateFrom->format('Y-m-d')){
+            $dateFrom->sub(new \DateInterval('P1D'));
+        }
         $arrResult = array();
         if (count( $arrMerchantID ) < 1) {
             $merchants = $this->getMerchants();
