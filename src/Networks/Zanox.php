@@ -9,6 +9,7 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
+use Padosoft\AffiliateNetwork\ZanoxEx;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/Zanox/Zapi/ApiClient.php";
 
@@ -26,6 +27,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     private $_username  = '';
     private $_password  = '';
     private $_logged    = false;
+    protected $_tracking_parameter    = 'zanp0';
 
 
     /**
@@ -248,5 +250,9 @@ class Zanox extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
     }
 }

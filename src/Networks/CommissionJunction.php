@@ -8,6 +8,7 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
+use Padosoft\AffiliateNetwork\DealsResultset;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/CommissionJunction/Zapi/ApiClient.php";
 
@@ -26,6 +27,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     private $_password = '';
     private $_passwordApi = '';
     private $_website_id = '';
+    protected $_tracking_parameter    = 'sid';
 
     /**
      * @method __construct
@@ -79,7 +81,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
         $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id='.$this->_website_id.'&promotion-type=coupon&advertiser-ids=joined');
         if (\preg_match("/error/", $response)) {
@@ -180,4 +182,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         return $curl_results;
     }
 
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
+    }
 }

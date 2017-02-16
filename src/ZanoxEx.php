@@ -4,7 +4,7 @@
  */
 
 
-namespace Padosoft\AffiliateNetwork\Networks;
+namespace Padosoft\AffiliateNetwork;
 use Oara\Network\Publisher\Zanox as ZanoxOara;
 
 class ZanoxEx extends ZanoxOara

@@ -2,7 +2,7 @@
 /**
  * Copyright (c) Padosoft.com 2017.
  */
-namespace Padosoft\AffiliateNetwork\Networks;
+namespace Padosoft\AffiliateNetwork;
 
 use Oara\Network\Publisher\TradeDoubler as TradeDoublerOara;
 

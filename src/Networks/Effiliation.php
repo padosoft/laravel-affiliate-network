@@ -8,6 +8,7 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
+use Padosoft\AffiliateNetwork\DealsResultset;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/Effiliation/Zapi/ApiClient.php";
 
@@ -23,7 +24,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     private $_network = null;
     private $_apiClient = null;
     private $_password = '';
-
+    protected $_tracking_parameter    = 'effi_id';
     /**
      * @method __construct
      */
@@ -72,7 +73,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
         $url = 'http://apiv2.effiliation.com/apiv2/programs.json?filter=mines&key='.$this->_password;
         $json = file_get_contents($url);
@@ -150,5 +151,9 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
     }
 }

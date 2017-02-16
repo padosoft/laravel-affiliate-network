@@ -3,6 +3,7 @@
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Transaction;
+use Padosoft\AffiliateNetwork\DealsResultset;
 use Padosoft\AffiliateNetwork\Merchant;
 use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
@@ -22,6 +23,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
     private $_username = '';
     private $_password = '';
     private $_apiClient = null;
+    protected $_tracking_parameter    = 'clickref';
 
     /**
      * @method __construct
@@ -39,6 +41,26 @@ class WebGains extends AbstractNetwork implements NetworkInterface
                 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
                 'soap_version' => SOAP_1_1)
         );
+        $this->login( $this->_username, $this->_password );
+    }
+
+    public function login(string $username, string $password): bool{
+        $this->_logged = false;
+        if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
+        $credentials = array();
+        $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_password;
+        $this->_network->login($credentials);
+        if ($this->_network->checkConnection()) {
+            $this->_logged = true;
+        }
+
+        return $this->_logged;
     }
 
     /**
@@ -46,15 +68,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        $credentials = array();
-        $credentials["user"] = $this->_username;
-        $credentials["password"] = $this->_password;
-        $this->_network->login($credentials);
-        if ($this->_network->checkConnection()) {
-            return true;
-        }
-
-        return false;
+        return $this->_logged;
     }
 
     /**
@@ -78,7 +92,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
         $arrResult = array();
         $arrResponse = $this->_apiClient->getFullEarnings(null, null, null, $this->_username, $this->_password);
@@ -160,5 +174,9 @@ class WebGains extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
     }
 }

@@ -34,13 +34,11 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app['ZanoxNetwork']=$this->app->share(function ($app) {
-            return new Zanox('','');
+
+        $this->app['NetworkManager']=$this->app->share(function ($app) {
+            return new NetworkManager();
         });
-        $this->app['ZanoxNetworkManager']=$this->app->share(function ($app) {
-            return new NetworkManager($app['ZanoxNetwork']);
-        });
-        $this->app->alias('ZanoxNetworkManager', NetworkManager::class);
+        $this->app->alias('NetworkManager', NetworkManager::class);
     }
 
     /**
@@ -51,7 +49,7 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'ZanoxNetworkManager','ZanoxNetwork'
+            'NetworkManager'
         ];
     }
 }

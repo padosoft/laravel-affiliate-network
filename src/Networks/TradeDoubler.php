@@ -9,7 +9,10 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
-define('COOKIES_BASE_DIR',public_path('upload/report'));
+use Padosoft\AffiliateNetwork\TradeDoublerEx;
+if (!defined('COOKIES_BASE_DIR')){
+    define('COOKIES_BASE_DIR',public_path('upload/report'));
+}
 /**
  * Class TradeDoubler
  * @package Padosoft\AffiliateNetwork\Networks
@@ -24,6 +27,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     private $_username = '';
     private $_password = '';
     private $_logged    = false;
+    protected $_tracking_parameter    = 'epi';
 
     /**
      * @method __construct
@@ -180,5 +184,9 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
         return array();        
+    }
+
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
     }
 }

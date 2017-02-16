@@ -8,6 +8,7 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
+use Padosoft\AffiliateNetwork\DealsResultset;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/Publicideas/Zapi/ApiClient.php";
 
@@ -25,7 +26,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
     private $_password = '';
     private $_token = '';
     private $_partner_id = '';
-
+    protected $_tracking_parameter    = 'cb';
     /**
      * @method __construct
      */
@@ -78,7 +79,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals(int $merchantID = 0) : array
+    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
         $url = 'http://publisher.publicideas.com/xmlProgAff.php?partid='.$this->_partner_id.'&key='.$this->_token.'&noDownload=yes';
         $xml = file_get_contents($url);
@@ -191,5 +192,9 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+    public function getTrackingParameter(){
+        return $this->_tracking_parameter;
     }
 }
