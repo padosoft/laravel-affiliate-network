@@ -7,8 +7,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/padosoft/laravel-affiliate-network.svg?style=flat-square)](https://packagist.org/packages/padosoft/laravel-affiliate-network)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/0008f1c1-34b2-4abd-8810-5bf5819ce45e.svg?style=flat-square)](https://insight.sensiolabs.com/projects/0008f1c1-34b2-4abd-8810-5bf5819ce45e)
 
-# WORK IN PROGRESS!!!!
-
 The goal of this Laravel package is to wrap the Publisher Network Affiliate API like Zanox, Tradedoubler,  Commission Junction etc.. and provide simple methods to get deals and sales report and return a common interface for your use.
 
 ##Overview
@@ -17,6 +15,13 @@ Common methods are:
 - getDeals : get the network deals.
 - getSales : get the network sales.
 - getStats : get the network deals stats.
+- getMerchants : get the network merchants.
+- checkLogin : check if logged in network.
+- login : login in into network.
+- getTrackingParameter : get network tracking params.
+- loadAvailableNetworks : get all available network.
+- hasNetwork : check if network are available.
+- addNetwork : add a network class that implements Network interface.
 
 ##Requires
   
@@ -95,6 +100,7 @@ in src/config folder you'll find an example for validate the env settings.
 - Publicideas.com
 - TradeDoubler
 - Zanox
+- WebGains
 
 
 ## Usage
