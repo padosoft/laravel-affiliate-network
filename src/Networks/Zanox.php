@@ -27,7 +27,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     private $_username  = '';
     private $_password  = '';
     private $_logged    = false;
-    protected $_tracking_parameter    = 'zanp0';
+    protected $_tracking_parameter    = 'zpar0';
 
 
     /**
