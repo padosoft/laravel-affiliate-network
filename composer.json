@@ -17,12 +17,6 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/padosoft/php-oara"
-        }
-    ],
     "require": {
         "php" : ">=7.0.0",
         "illuminate/support": "^5.0",
