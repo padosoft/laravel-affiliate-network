@@ -145,13 +145,16 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
             $Transaction->custom_ID = $transaction['custom_id'];
-            $Transaction->title = $transaction['title'];
+            $Transaction->title = '';
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->commission = $transaction['commission'];
             $date = new \DateTime($transaction['date']);
             $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
             $Transaction->merchant_ID = $transaction['merchantId'];
-            $Transaction->approved = $transaction['approved'];
+            $Transaction->approved = false;
+            if ($Transaction->status==\Oara\Utilities::STATUS_CONFIRMED){
+                $Transaction->approved = true;
+            }
             $arrResult[] = $Transaction;
         }
 
