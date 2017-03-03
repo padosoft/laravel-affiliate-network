@@ -116,7 +116,23 @@ $arrDeals = NetworkManager::getDeals($dateFrom, $dateTo, $merchantID);
 var_dump($arrDeals);//array of Deal
 
 ```
+In Laravel:
 
+```php
+
+$networkManager=app(NetworkManager::class);
+
+$dateFrom=new DateTime();
+$dateTo= new DateTime();
+
+//if you want to specify specific Merchant:
+$arrMerchantID = array(
+    array('cid' => '106818', 'name' => 'Spartoo.it')
+);
+
+$transactions = $networkManager->getSales('TradeDoubler',$dateFrom,$dateTo,$arrMerchantID);
+
+```
 
 ## Change log
 
