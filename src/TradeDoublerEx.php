@@ -12,64 +12,65 @@ class TradeDoublerEx extends TradeDoublerOara
     {
         $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
+        $updateTransactions = Array();
         $totalTransactions = Array();
         $valuesFormExport = array(new \Oara\Curl\Parameter('reportName', 'aAffiliateEventBreakdownReport'),
-            new \Oara\Curl\Parameter('columns', 'programId'),
-            new \Oara\Curl\Parameter('columns', 'timeOfVisit'),
-            new \Oara\Curl\Parameter('columns', 'timeOfEvent'),
-            new \Oara\Curl\Parameter('columns', 'timeInSession'),
-            new \Oara\Curl\Parameter('columns', 'lastModified'),
-            new \Oara\Curl\Parameter('columns', 'epi1'),
-            new \Oara\Curl\Parameter('columns', 'eventName'),
-            new \Oara\Curl\Parameter('columns', 'pendingStatus'),
-            new \Oara\Curl\Parameter('columns', 'siteName'),
-            new \Oara\Curl\Parameter('columns', 'graphicalElementName'),
-            new \Oara\Curl\Parameter('columns', 'graphicalElementId'),
-            new \Oara\Curl\Parameter('columns', 'productName'),
-            new \Oara\Curl\Parameter('columns', 'productNrOf'),
-            new \Oara\Curl\Parameter('columns', 'productValue'),
-            new \Oara\Curl\Parameter('columns', 'affiliateCommission'),
-            new \Oara\Curl\Parameter('columns', 'link'),
-            new \Oara\Curl\Parameter('columns', 'leadNR'),
-            new \Oara\Curl\Parameter('columns', 'orderNR'),
-            new \Oara\Curl\Parameter('columns', 'pendingReason'),
-            new \Oara\Curl\Parameter('columns', 'orderValue'),
-            new \Oara\Curl\Parameter('isPostBack', ''),
-            new \Oara\Curl\Parameter('metric1.lastOperator', '/'),
-            new \Oara\Curl\Parameter('interval', ''),
-            new \Oara\Curl\Parameter('favoriteDescription', ''),
-            new \Oara\Curl\Parameter('event_id', '0'),
-            new \Oara\Curl\Parameter('pending_status', '1'),
-            new \Oara\Curl\Parameter('run_as_organization_id', ''),
-            new \Oara\Curl\Parameter('minRelativeIntervalStartTime', '0'),
-            new \Oara\Curl\Parameter('includeWarningColumn', 'true'),
-            new \Oara\Curl\Parameter('metric1.summaryType', 'NONE'),
-            new \Oara\Curl\Parameter('metric1.operator1', '/'),
-            new \Oara\Curl\Parameter('latestDayToExecute', '0'),
-            new \Oara\Curl\Parameter('showAdvanced', 'true'),
-            new \Oara\Curl\Parameter('breakdownOption', '1'),
-            new \Oara\Curl\Parameter('metric1.midFactor', ''),
-            new \Oara\Curl\Parameter('reportTitleTextKey', 'REPORT3_SERVICE_REPORTS_AAFFILIATEEVENTBREAKDOWNREPORT_TITLE'),
-            new \Oara\Curl\Parameter('setColumns', 'true'),
-            new \Oara\Curl\Parameter('metric1.columnName1', 'orderValue'),
-            new \Oara\Curl\Parameter('metric1.columnName2', 'orderValue'),
-            new \Oara\Curl\Parameter('reportPrograms', ''),
-            new \Oara\Curl\Parameter('metric1.midOperator', '/'),
-            new \Oara\Curl\Parameter('dateSelectionType', '2'),
-            new \Oara\Curl\Parameter('favoriteName', ''),
-            new \Oara\Curl\Parameter('affiliateId', ''),
-            new \Oara\Curl\Parameter('dateType', '1'),
-            new \Oara\Curl\Parameter('period', 'custom_period'),
-            new \Oara\Curl\Parameter('tabMenuName', ''),
-            new \Oara\Curl\Parameter('maxIntervalSize', '0'),
-            new \Oara\Curl\Parameter('favoriteId', ''),
-            new \Oara\Curl\Parameter('sortBy', 'timeOfEvent'),
-            new \Oara\Curl\Parameter('metric1.name', ''),
-            new \Oara\Curl\Parameter('customKeyMetricCount', '0'),
-            new \Oara\Curl\Parameter('metric1.factor', ''),
-            new \Oara\Curl\Parameter('showFavorite', 'false'),
-            new \Oara\Curl\Parameter('separator', ','),
-            new \Oara\Curl\Parameter('format', 'CSV')
+                                  new \Oara\Curl\Parameter('columns', 'programId'),
+                                  new \Oara\Curl\Parameter('columns', 'timeOfVisit'),
+                                  new \Oara\Curl\Parameter('columns', 'timeOfEvent'),
+                                  new \Oara\Curl\Parameter('columns', 'timeInSession'),
+                                  new \Oara\Curl\Parameter('columns', 'lastModified'),
+                                  new \Oara\Curl\Parameter('columns', 'epi1'),
+                                  new \Oara\Curl\Parameter('columns', 'eventName'),
+                                  new \Oara\Curl\Parameter('columns', 'pendingStatus'),
+                                  new \Oara\Curl\Parameter('columns', 'siteName'),
+                                  new \Oara\Curl\Parameter('columns', 'graphicalElementName'),
+                                  new \Oara\Curl\Parameter('columns', 'graphicalElementId'),
+                                  new \Oara\Curl\Parameter('columns', 'productName'),
+                                  new \Oara\Curl\Parameter('columns', 'productNrOf'),
+                                  new \Oara\Curl\Parameter('columns', 'productValue'),
+                                  new \Oara\Curl\Parameter('columns', 'affiliateCommission'),
+                                  new \Oara\Curl\Parameter('columns', 'link'),
+                                  new \Oara\Curl\Parameter('columns', 'leadNR'),
+                                  new \Oara\Curl\Parameter('columns', 'orderNR'),
+                                  new \Oara\Curl\Parameter('columns', 'pendingReason'),
+                                  new \Oara\Curl\Parameter('columns', 'orderValue'),
+                                  new \Oara\Curl\Parameter('isPostBack', ''),
+                                  new \Oara\Curl\Parameter('metric1.lastOperator', '/'),
+                                  new \Oara\Curl\Parameter('interval', ''),
+                                  new \Oara\Curl\Parameter('favoriteDescription', ''),
+                                  new \Oara\Curl\Parameter('event_id', '0'),
+                                  new \Oara\Curl\Parameter('pending_status', '1'),
+                                  new \Oara\Curl\Parameter('run_as_organization_id', ''),
+                                  new \Oara\Curl\Parameter('minRelativeIntervalStartTime', '0'),
+                                  new \Oara\Curl\Parameter('includeWarningColumn', 'true'),
+                                  new \Oara\Curl\Parameter('metric1.summaryType', 'NONE'),
+                                  new \Oara\Curl\Parameter('metric1.operator1', '/'),
+                                  new \Oara\Curl\Parameter('latestDayToExecute', '0'),
+                                  new \Oara\Curl\Parameter('showAdvanced', 'true'),
+                                  new \Oara\Curl\Parameter('breakdownOption', '1'),
+                                  new \Oara\Curl\Parameter('metric1.midFactor', ''),
+                                  new \Oara\Curl\Parameter('reportTitleTextKey', 'REPORT3_SERVICE_REPORTS_AAFFILIATEEVENTBREAKDOWNREPORT_TITLE'),
+                                  new \Oara\Curl\Parameter('setColumns', 'true'),
+                                  new \Oara\Curl\Parameter('metric1.columnName1', 'orderValue'),
+                                  new \Oara\Curl\Parameter('metric1.columnName2', 'orderValue'),
+                                  new \Oara\Curl\Parameter('reportPrograms', ''),
+                                  new \Oara\Curl\Parameter('metric1.midOperator', '/'),
+                                  new \Oara\Curl\Parameter('dateSelectionType', '2'),
+                                  new \Oara\Curl\Parameter('favoriteName', ''),
+                                  new \Oara\Curl\Parameter('affiliateId', ''),
+                                  new \Oara\Curl\Parameter('dateType', '1'),
+                                  new \Oara\Curl\Parameter('period', 'custom_period'),
+                                  new \Oara\Curl\Parameter('tabMenuName', ''),
+                                  new \Oara\Curl\Parameter('maxIntervalSize', '0'),
+                                  new \Oara\Curl\Parameter('favoriteId', ''),
+                                  new \Oara\Curl\Parameter('sortBy', 'timeOfEvent'),
+                                  new \Oara\Curl\Parameter('metric1.name', ''),
+                                  new \Oara\Curl\Parameter('customKeyMetricCount', '0'),
+                                  new \Oara\Curl\Parameter('metric1.factor', ''),
+                                  new \Oara\Curl\Parameter('showFavorite', 'false'),
+                                  new \Oara\Curl\Parameter('separator', ','),
+                                  new \Oara\Curl\Parameter('format', 'CSV')
         );
         $valuesFormExport[] = new \Oara\Curl\Parameter('startDate', self::formatDate($dStartDate));
         $valuesFormExport[] = new \Oara\Curl\Parameter('endDate', self::formatDate($dEndDate));
@@ -128,18 +129,53 @@ class TradeDoublerEx extends TradeDoublerOara
                     }
 
                     $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[20]);
-                    $totalTransactions[] = $transaction;
+                    $updateTransactions[] = $transaction;
                 }
             }
         }
         $insertedTransactions=parent::getTransactionList($merchantList,$dStartDate,$dEndDate);
+        $parsedIDs=[];
         foreach ($insertedTransactions as $transaction){
             if (array_key_exists('unique_id',$transaction)){
+
                 $found=false;
-                foreach ($totalTransactions as $transaction2){
-                    if ($transaction2['unique_id']==$transaction['unique_id']){
-                        $found=true;
-                        break;
+                for ($i=0;$i<count($totalTransactions);$i++){
+                    if ($totalTransactions[$i]['unique_id']==$transaction['unique_id']){
+                        if ($totalTransactions[$i]['commission']<=0){
+                            $totalTransactions[$i]=$transaction;
+                            $found=true;
+                            break;
+                        }
+                        if ($totalTransactions[$i]['status']==\Oara\Utilities::STATUS_DECLINED){
+                            $totalTransactions[$i]=$transaction;
+                            $found=true;
+                            break;
+                        }
+
+                    }
+                }
+                if (!$found){
+                    $totalTransactions[]=$transaction;
+                }
+            }
+        }
+        foreach ($updateTransactions as $transaction){
+            if (array_key_exists('unique_id',$transaction)){
+
+                $found=false;
+                for ($i=0;$i<count($totalTransactions);$i++){
+                    if ($totalTransactions[$i]['unique_id']==$transaction['unique_id']){
+                        if ($totalTransactions[$i]['commission']<=0){
+                            $totalTransactions[$i]=$transaction;
+                            $found=true;
+                            break;
+                        }
+                        if ($totalTransactions[$i]['status']==\Oara\Utilities::STATUS_DECLINED){
+                            $totalTransactions[$i]=$transaction;
+                            $found=true;
+                            break;
+                        }
+
                     }
                 }
                 if (!$found){
