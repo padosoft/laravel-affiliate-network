@@ -32,7 +32,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password)
+    public function __construct(string $username, string $password,string $idSite='')
     {
         $this->_network = new TradeDoublerEx;
         $this->_username = $username;
@@ -41,7 +41,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
         $this->login( $this->_username, $this->_password );
     }
 
-    public function login(string $username, string $password): bool
+    public function login(string $username, string $password,string $idSite=''): bool
     {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {

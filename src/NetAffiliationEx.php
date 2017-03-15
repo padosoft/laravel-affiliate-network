@@ -80,7 +80,12 @@ class NetAffiliationEx extends NetAffiliationOara
 
         return $connection;
     }*/
-
+    /**
+     * @param string $idSite
+     */
+    public function addAllowedSite(string $idSite){
+        $this->_sitesAllowed[]=$idSite;
+    }
     /**
      * @param null $merchantList
      * @param \DateTime|null $dStartDate

@@ -26,17 +26,39 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
     private $_password = '';
     private $_token = '';
     private $_partner_id = '';
+    private $_logged    = false;
     protected $_tracking_parameter    = 'cb';
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password, string $token, string $partner_id)
+    public function __construct(string $username, string $password, string $token='',string $partner_id='')
     {
         $this->_network = new \Oara\Network\Publisher\Publicidees;
         $this->_username = $username;
         $this->_password = $password;
         $this->_token = $token;
         $this->_partner_id = $partner_id;
+        $this->login( $this->_username, $this->_password );
+    }
+
+    public function login(string $username, string $password,string $idSite=''): bool{
+        $this->_logged = false;
+        if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
+        $credentials = array();
+        $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_password;
+        $this->_network->login($credentials);
+        if ($this->_network->checkConnection()) {
+            $this->_logged = true;
+
+        }
+
+        return $this->_logged;
     }
 
     /**
@@ -44,18 +66,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        $credentials = array();
-        $credentials["user"] = $this->_username;
-        $credentials["password"] = $this->_password;
-        $this->_network->login($credentials);
-
-        var_dump($this->_network->checkConnection());
-
-        if ($this->_network->checkConnection()) {
-            return true;
-        }
-
-        return false;
+        return $this->_logged;
     }
 
     /**
@@ -137,7 +148,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
         return $arrResult;
         */
 
-       return array();
+        return array();
 
     }
 
@@ -149,7 +160,16 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
+        if (!$this->checkLogin()) {
+            return array();
+        }
         $arrResult = array();
+        if (count( $arrMerchantID ) < 1) {
+            $merchants = $this->getMerchants();
+            foreach ($merchants as $merchant) {
+                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+            }
+        }
         $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();

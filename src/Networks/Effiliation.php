@@ -28,11 +28,31 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $password)
+    public function __construct(string $username, string $password,string $idSite='')
     {
-        $this->_network = new \Oara\Network\Publisher\Effiliation;
+        $this->_network = new \Padosoft\AffiliateNetwork\EffiliationEx;
+        $this->_username = $username;
         $this->_password = $password;
+        $this->login( $this->_username, $this->_password );
         $this->_apiClient = null;
+    }
+    public function login(string $username, string $password,string $idSite=''): bool{
+        $this->_logged = false;
+        if (isNullOrEmpty( $password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
+        $credentials = array();
+        $credentials["apiPassword"] = $this->_password;
+        $this->_network->login($credentials);
+        if ($this->_network->checkConnection()) {
+            $this->_logged = true;
+
+        }
+
+        return $this->_logged;
     }
 
     /**
@@ -40,14 +60,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        $credentials = array();
-        $credentials["apipassword"] = $this->_password;
-        $this->_network->login($credentials);
-        if ($this->_network->checkConnection()) {
-            return true;
-        }
-
-        return false;
+        return $this->_logged;
     }
 
     /**
@@ -113,16 +126,28 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
         $arrResult = array();
+        if (count( $arrMerchantID ) < 1) {
+            $merchants = $this->getMerchants();
+            foreach ($merchants as $merchant) {
+                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+            }
+        }
         $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->merchant_ID = $transaction['merchantId'];
+            $Transaction->title ='';
+            $Transaction->currency ='EUR';
             $date = new \DateTime($transaction['date']);
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->custom_ID = $transaction['custom_id'];
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
             $Transaction->commission = $transaction['commission'];
+            $Transaction->approved = false;
+            if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
+                $Transaction->approved = true;
+            }
             $arrResult[] = $Transaction;
         }
 

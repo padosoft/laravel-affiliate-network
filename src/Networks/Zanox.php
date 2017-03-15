@@ -33,7 +33,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password)
+    public function __construct(string $username, string $password,string $idSite='')
     {
         $this->_network = new ZanoxEx;
         $this->_username = $username;
@@ -42,7 +42,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
 
     }
 
-    public function login(string $username, string $password): bool
+    public function login(string $username, string $password,string $idSite=''): bool
     {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
@@ -188,9 +188,11 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         if (!$this->checkLogin()) {
             return array();
         }
-        if ($dateTo->format('Y-m-d')==$dateFrom->format('Y-m-d')){
-            $dateFrom->sub(new \DateInterval('P1D'));
+        $dateFrom2=new \DateTime($dateFrom->format('Y-m-d'));
+        if ($dateTo->format('Y-m-d')==$dateFrom2->format('Y-m-d')){
+            $dateFrom2->sub(new \DateInterval('P1D'));
         }
+
         $arrResult = array();
         if (count( $arrMerchantID ) < 1) {
             $merchants = $this->getMerchants();
@@ -198,7 +200,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList( $arrMerchantID, $dateTo, $dateFrom );
+        $transcationList = $this->_network->getTransactionList( $arrMerchantID, $dateTo, $dateFrom2 );
         foreach ($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             array_key_exists_safe( $transaction,

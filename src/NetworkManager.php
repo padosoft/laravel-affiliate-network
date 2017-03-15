@@ -145,11 +145,11 @@ class NetworkManager
         }
         return $this->networks[$network_alias]->checkLogin();
     }
-    public function login(string $network_alias,string $username, string $password): bool{
+    public function login(string $network_alias,string $username, string $password,string $idSite=''): bool{
         if (!$this->hasNetwork($network_alias)) {
             return false;
         }
-        return $this->networks[$network_alias]->login($username,$password);
+        return $this->networks[$network_alias]->login($username,$password,$idSite);
     }
 
     public function getTrackingParameter(string $network_alias):string {

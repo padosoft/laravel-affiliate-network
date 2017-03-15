@@ -25,22 +25,35 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
     private $_network = null;
     private $_username = '';
     private $_password = '';
+    private $_idSite = '';
     private $_logged    = false;
     protected $_tracking_parameter    = 'argsite';
 
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password)
+    public function __construct(string $username, string $password,string $idSite='')
     {
         $this->_network = new NetAffiliationEx();
         $this->_username = $username;
         $this->_password = $password;
+        if (trim($idSite)!=''){
+            $this->addAllowedSite($idSite);
+        }
         $this->login( $this->_username, $this->_password );
     }
 
-    public function login(string $username, string $password): bool
+    public function addAllowedSite($idSite){
+        if (trim($idSite)!=''){
+            $this->_network->addAllowedSite($idSite);
+        }
+    }
+
+    public function login(string $username, string $password,string $idSite=''): bool
     {
+        if (trim($idSite)!=''){
+            $this->addAllowedSite($idSite);
+        }
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
 
