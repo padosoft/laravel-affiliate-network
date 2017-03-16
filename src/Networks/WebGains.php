@@ -144,7 +144,8 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             $Transaction->currency = $transaction['currency'];
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
-            $Transaction->custom_ID = $transaction['custom_id'];
+            array_key_exists_safe( $transaction,
+                'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
             $Transaction->title = '';
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->commission = $transaction['commission'];
