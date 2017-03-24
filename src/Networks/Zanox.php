@@ -200,7 +200,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList( $arrMerchantID, $dateTo, $dateFrom2 );
+        $transcationList = $this->_network->getTransactionList( $arrMerchantID, $dateFrom2, $dateTo );
         foreach ($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             array_key_exists_safe( $transaction,

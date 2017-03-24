@@ -138,7 +138,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             }
         }
         $arrResult = array();
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->currency = $transaction['currency'];

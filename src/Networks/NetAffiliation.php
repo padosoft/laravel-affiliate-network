@@ -163,7 +163,7 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
             }
         }
 
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             array_key_exists_safe( $transaction,

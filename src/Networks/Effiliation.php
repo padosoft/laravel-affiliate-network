@@ -132,7 +132,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->merchant_ID = $transaction['merchantId'];
