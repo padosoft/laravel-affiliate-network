@@ -139,6 +139,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
             $Transaction->title ='';
             $Transaction->currency ='EUR';
             $date = new \DateTime($transaction['date']);
+            $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->custom_ID = $transaction['custom_id'];
             $Transaction->status = $transaction['status'];
