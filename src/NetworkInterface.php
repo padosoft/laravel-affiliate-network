@@ -32,4 +32,14 @@ interface NetworkInterface
      * @return array of Stat
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array ;
+
+
+    /**
+     * @param array|null $merchantID
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $merchantID = null, int $page, int $pageSize) : ProductsResultset ;
 }
