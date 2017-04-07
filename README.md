@@ -111,9 +111,22 @@ Create new php file, add composer autoload and start using functions.
 <?php
 
 require "vendor/autoload.php";
-
-$arrDeals = NetworkManager::getDeals($dateFrom, $dateTo, $merchantID);
-var_dump($arrDeals);//array of Deal
+//if not in laravel need to define this functions
+if (!function_exists('public_path')){
+    function public_path(){
+        return dirname(__FILE__);
+    }
+}
+$objNetworkManager= new NetworkManager();
+$objNetworkManager->login('Zanox',$_ENV['ZANOX_USERNAME'], $_ENV['ZANOX_PASSWORD']);
+$isLogged = $objNetworkManager->checkLogin('Zanox');
+if ($isLogged){
+    echo '<h1>Deals</h1>';
+    $arrDeals = $objNetworkManager->getDeals('Zanox');
+    echo '<pre>';
+    var_dump($arrDeals);
+    echo '</pre>';
+}
 
 ```
 In Laravel:
@@ -127,10 +140,19 @@ $dateTo= new DateTime();
 
 //if you want to specify specific Merchant:
 $arrMerchantID = array(
-    array('cid' => '106818', 'name' => 'Spartoo.it')
+    array('cid' => '9716', 'name' => 'Zalando IT')
 );
-
-$transactions = $networkManager->getSales('TradeDoubler',$dateFrom,$dateTo,$arrMerchantID);
+$networkManager->login('Zanox',$_ENV['ZANOX_USERNAME'], $_ENV['ZANOX_PASSWORD']);
+$isLogged = $networkManager->checkLogin('Zanox');
+if ($isLogged){
+    echo '<h1>Transactions</h1>';
+    $transactions = $networkManager->getSales('Zanox',$dateFrom,$dateTo,$arrMerchantID);
+    echo '<h1>Deals</h1>';
+    $arrDeals = $networkManager->getDeals('Zanox');
+    echo '<pre>';
+    var_dump($arrDeals);
+    echo '</pre>';
+}
 
 ```
 
