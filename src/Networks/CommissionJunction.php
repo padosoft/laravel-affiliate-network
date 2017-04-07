@@ -87,7 +87,8 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         if (\preg_match("/error/", $response)) {
             return false;
         }
-        $arrResult = array();
+        $arrResult = new DealsResultset();
+
         $arrResponse = xml2array($response);
         if(!is_array($arrResponse) || count($arrResponse) <= 0) {
             return $arrResult;
@@ -106,11 +107,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Deal->code = $coupon['coupon-code'];
             if($merchantID > 0) {
                 if($merchantID == $coupon['advertiser-id']) {
-                    $arrResult[] = $Deal;
+                    $arrResult->deals[] = $Deal;
                 }
             }
             else {
-                $arrResult[] = $Deal;
+                $arrResult->deals[] = $Deal;
             }
         }
 
