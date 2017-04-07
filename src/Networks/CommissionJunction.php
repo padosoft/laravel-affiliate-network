@@ -101,7 +101,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Deal->description = $coupon['description'];
             $startDate = new \DateTime($coupon['promotion-start-date']);
             $Deal->startDate = $startDate;
-            $startDate = new \DateTime($coupon['promotion-end-date']);
+            $endDate = new \DateTime($coupon['promotion-end-date']);
             $Deal->endDate = $endDate;
             $Deal->code = $coupon['coupon-code'];
             if($merchantID > 0) {
