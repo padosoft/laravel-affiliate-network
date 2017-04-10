@@ -10,6 +10,8 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\TradeDoublerEx;
+use Padosoft\AffiliateNetwork\ProductsResultset;
+
 if (!defined('COOKIES_BASE_DIR')){
     define('COOKIES_BASE_DIR',public_path('upload/report'));
 }
@@ -185,6 +187,20 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
         return array();        
+    }
+
+
+    /**
+     * @param array|null $merchantID
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $merchantID = null, int $page, int $pageSize): ProductsResultset
+    {
+        // TODO: Implement getProducts() method.
+        throw new \Exception("Not implemented yet");
     }
 
     public function getTrackingParameter(){

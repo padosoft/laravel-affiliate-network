@@ -10,6 +10,8 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\NetAffiliationEx;
+use Padosoft\AffiliateNetwork\ProductsResultset;
+
 if (!defined('COOKIES_BASE_DIR')){
     define('COOKIES_BASE_DIR',public_path('upload/report'));
 }
@@ -215,6 +217,20 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+
+    /**
+     * @param array|null $merchantID
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $merchantID = null, int $page, int $pageSize): ProductsResultset
+    {
+        // TODO: Implement getProducts() method.
+        throw new \Exception("Not implemented yet");
     }
 
     public function getTrackingParameter(){

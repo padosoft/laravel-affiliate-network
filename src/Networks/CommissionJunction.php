@@ -9,6 +9,7 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\DealsResultset;
+use Padosoft\AffiliateNetwork\ProductsResultset;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/CommissionJunction/Zapi/ApiClient.php";
 
@@ -27,7 +28,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     private $_password = '';
     private $_passwordApi = '';
     private $_website_id = '';
-    protected $_tracking_parameter    = 'sid';
+    protected $_tracking_parameter = 'sid';
 
     /**
      * @method __construct
@@ -45,7 +46,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @return bool
      */
-    public function checkLogin() : bool
+    public function checkLogin(): bool
     {
         $credentials = array();
         $credentials["user"] = $this->_username;
@@ -63,11 +64,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @return array of Merchants
      */
-    public function getMerchants() : array
+    public function getMerchants(): array
     {
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
-        foreach($merchantList as $merchant) {
+        foreach ($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
@@ -81,20 +82,20 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
+    public function getDeals($merchantID = NULL, int $page = 0, int $items_per_page = 10): DealsResultset
     {
-        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id='.$this->_website_id.'&promotion-type=coupon&advertiser-ids=joined');
+        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&promotion-type=coupon&advertiser-ids=joined');
         if (\preg_match("/error/", $response)) {
             return false;
         }
         $arrResult = new DealsResultset();
 
         $arrResponse = xml2array($response);
-        if(!is_array($arrResponse) || count($arrResponse) <= 0) {
+        if (!is_array($arrResponse) || count($arrResponse) <= 0) {
             return $arrResult;
         }
         $arrCoupon = $arrResponse['cj-api']['links']['link'];
-        foreach($arrCoupon as $coupon) {
+        foreach ($arrCoupon as $coupon) {
             $Deal = Deal::createInstance();
             $Deal->merchant_ID = $coupon['advertiser-id'];
             $Deal->merchant_name = $coupon['advertiser-name'];
@@ -105,12 +106,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $endDate = new \DateTime($coupon['promotion-end-date']);
             $Deal->endDate = $endDate;
             $Deal->code = $coupon['coupon-code'];
-            if($merchantID > 0) {
-                if($merchantID == $coupon['advertiser-id']) {
+            if ($merchantID > 0) {
+                if ($merchantID == $coupon['advertiser-id']) {
                     $arrResult->deals[] = $Deal;
                 }
-            }
-            else {
+            } else {
                 $arrResult->deals[] = $Deal;
             }
         }
@@ -124,11 +124,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
     {
         $arrResult = array();
         $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
-        foreach($transcationList as $transaction) {
+        foreach ($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
@@ -150,7 +150,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Stat
      */
-    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
+    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0): array
     {
         return array();
         /*
@@ -169,8 +169,21 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-    * Api call CommissionJunction
-    */
+     * @param array|null $merchantID
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $merchantID = null, int $page, int $pageSize): ProductsResultset
+    {
+        // TODO: Implement getProducts() method.
+        throw new \Exception("Not implemented yet");
+    }
+
+    /**
+     * Api call CommissionJunction
+     */
     private function _apiCall($url)
     {
         $ch = curl_init();
@@ -183,7 +196,8 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         return $curl_results;
     }
 
-    public function getTrackingParameter(){
+    public function getTrackingParameter()
+    {
         return $this->_tracking_parameter;
     }
 }
