@@ -256,9 +256,40 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         */
     }
 
-    public function getProducts(array $merchantID = NULL, int $page = 0, int $pageSize = 10): ProductsResultset
+    /**
+     * @param  array $params  this array can contains these keys
+     *                        string      query          search string
+     *                        string      searchType     search type (optional) (contextual or phrase)
+     *                        string      region         limit search to region (optional)
+     *                        int         categoryId     limit search to categorys (optional)
+     *                        array       programId      limit search to program list of programs (optional)
+     *                        boolean     hasImages      products with images (optional)
+     *                        float       minPrice       minimum price (optional)
+     *                        float       maxPrice       maximum price (optional)
+     *                        int         adspaceId      adspace id (optional)
+     *                        int         page           page of result set (optional)
+     *                        int         items          items per page (optional)
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $params = []): ProductsResultset
     {
-        $products =  $this->_network->getProducts($merchantID, $page, $pageSize);
+        $_params = array_merge([
+            'query' => null,
+            'searchType' => null,
+            'query' => null,
+            'searchType' => null,
+            'region' => null,
+            'categoryId' => null,
+            'programId' => null,
+            'hasImages' => null,
+            'minPrice' => null,
+            'maxPrice' => null,
+            'adspaceId' => null,
+            'page' => 0,
+            'items' => 10
+        ], $params);
+        $products =  $this->_network->getProducts($_params);
         $set = ProductsResultset::createInstance();
         if (!property_exists($products, 'productItems') || !property_exists($products->productItems, 'productItem'))
         {

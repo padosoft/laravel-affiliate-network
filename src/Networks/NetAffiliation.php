@@ -221,13 +221,11 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
 
 
     /**
-     * @param array|null $merchantID
-     * @param int $page
-     * @param int $pageSize
+     * @param  array $params
      *
      * @return ProductsResultset
      */
-    public function getProducts(array $merchantID = null, int $page, int $pageSize): ProductsResultset
+    public function getProducts(array $params = []): ProductsResultset
     {
         // TODO: Implement getProducts() method.
         throw new \Exception("Not implemented yet");
