@@ -100,9 +100,6 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
             return $arrResult;
         }
         $arrPartner = $arrResponse['partner'];
-        echo '<pre>';
-        var_dump($arrPartner);
-        echo '</pre>';
 
         /*
         foreach($arrPartner as $partner) {
