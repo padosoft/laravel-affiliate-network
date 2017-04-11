@@ -39,7 +39,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $passwordApi;
         $this->_passwordApi = $passwordApi;
-        $this->_website_id = $website_id;
+        $this->_website_id = $idSite;
         $this->login( $this->_username, $this->_password ,$idSite);
         // $this->_apiClient = \ApiClient::factory(PROTOCOL_JSON);
     }
@@ -99,25 +99,45 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID = NULL, int $page = 0, int $items_per_page = 10): DealsResultset
     {
-        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&promotion-type=coupon&advertiser-ids=joined');
-        if (\preg_match("/error/", $response)) {
-            return false;
+        if ($page<1){
+            $page=1;
         }
         $arrResult = new DealsResultset();
+        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&promotion-type=coupon&advertiser-ids=joined&records-per-page='.$items_per_page.'&page-number='.$page);
+        //var_dump($response);
+        if ($response===false || \preg_match("/error/", $response)) {
+            return $arrResult;
+        }
+
 
         $arrResponse = xml2array($response);
+
         if (!is_array($arrResponse) || count($arrResponse) <= 0) {
             return $arrResult;
         }
+        if (!isset($arrResponse['cj-api']['links'])){
+            return $arrResult;
+        }
+        $arrResult->page=$arrResponse['cj-api']['links_attr']['page-number'];
+        $arrResult->items=$arrResponse['cj-api']['links_attr']['records-returned'];
+        $arrResult->total=$arrResponse['cj-api']['links_attr']['total-matched'];
+        ($arrResult->total>0)?$arrResult->num_pages=(int)ceil($arrResult->total/$items_per_page):$arrResult->num_pages=0;
         $arrCoupon = $arrResponse['cj-api']['links']['link'];
+
         foreach ($arrCoupon as $coupon) {
+            //  var_dump($coupon);
             $Deal = Deal::createInstance();
+            $Deal->id = $coupon['link-id'];
+            $Deal->name = $coupon['link-name'];
+            $Deal->description = $coupon['description'];
+            $Deal->note = $coupon['description'];
             $Deal->merchant_ID = $coupon['advertiser-id'];
             $Deal->merchant_name = $coupon['advertiser-name'];
-            $Deal->ppc = $coupon['click-commission'];
+            $Deal->ppc = $coupon['clickUrl'];
             $Deal->description = $coupon['description'];
             $startDate = new \DateTime($coupon['promotion-start-date']);
             $Deal->startDate = $startDate;
+            $Deal->created_at = $startDate;
             $endDate = new \DateTime($coupon['promotion-end-date']);
             $Deal->endDate = $endDate;
             $Deal->code = $coupon['coupon-code'];
