@@ -103,7 +103,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $page=1;
         }
         $arrResult = new DealsResultset();
-        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&promotion-type=coupon&advertiser-ids=joined&records-per-page='.$items_per_page.'&page-number='.$page);
+        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&advertiser-ids='.$merchantID.'&records-per-page='.$items_per_page.'&page-number='.$page);
         //var_dump($response);
         if ($response===false || \preg_match("/error/", $response)) {
             return $arrResult;
@@ -135,19 +135,17 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Deal->merchant_name = $coupon['advertiser-name'];
             $Deal->ppc = $coupon['clickUrl'];
             $Deal->description = $coupon['description'];
-            $startDate = new \DateTime($coupon['promotion-start-date']);
-            $Deal->startDate = $startDate;
-            $Deal->created_at = $startDate;
-            $endDate = new \DateTime($coupon['promotion-end-date']);
-            $Deal->endDate = $endDate;
-            $Deal->code = $coupon['coupon-code'];
-            if ($merchantID > 0) {
-                if ($merchantID == $coupon['advertiser-id']) {
-                    $arrResult->deals[] = $Deal;
-                }
-            } else {
-                $arrResult->deals[] = $Deal;
+            if (!empty($coupon['promotion-start-date'])) {
+                $startDate = new \DateTime($coupon['promotion-start-date']);
+                $Deal->startDate = $startDate;
+                $Deal->created_at = $startDate;
             }
+            if (!empty($coupon['promotion-end-date'])) {
+                $endDate = new \DateTime($coupon['promotion-end-date']);
+                $Deal->endDate = $endDate;
+            }
+            $Deal->code = $coupon['coupon-code'];
+            $arrResult->deals[] = $Deal;
         }
 
         return $arrResult;
@@ -169,19 +167,34 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             }
         }
         $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom,$dateTo);
+        //echo "<br>merchants id array<br>".print_r($arrMerchantID);
+        //$counter=0;
         foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
-            $Transaction->custom_ID = $transaction['custom_id'];
-            $Transaction->unique_ID = $transaction['unique_id'];
+            $Transaction->custom_ID = $transaction['aid'];
+            $Transaction->unique_ID = $transaction['commission-id'];
+            $Transaction->transaction_ID = $transaction['order-id'];
             $Transaction->commission = $transaction['commission'];
-            $date = new \DateTime($transaction['date']);
-            $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
+            if (!empty($transaction['date'])) {
+                $date = new \DateTime($transaction['date']);
+                $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
+            }
             $Transaction->merchant_ID = $transaction['merchantId'];
-            $arrResult[] = $Transaction;
-        }
+            //original	Displays either a '1' indicating an original transaction or a '0' indicating a non-original or correction transaction.
+            //considero transazioni valide solo quelle di tipo original come viene fatto dal report consultabile sul sito web di c.j.
+            if ($transaction['original'] == 'true') {
+                $arrResult[] = $Transaction;
+                //$counter++;
+            }
+            /*
+            echo "custom_id ".$transaction['custom_id']." unique_id ".$transaction['unique_id']." aid ".$transaction['aid']." commission-id ".$transaction['commission-id'].
+            " order-id ".$transaction['order-id']." original ".$transaction['original']."<br>";
+            */
 
+        }
+        //echo "<br>num transazioni: ".$counter;
         return $arrResult;
     }
 
