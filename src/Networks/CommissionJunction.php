@@ -33,32 +33,47 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password, string $passwordApi, string $website_id)
+    public function __construct(string $username, string $passwordApi, string $idSite='')
     {
         $this->_network = new \Oara\Network\Publisher\CommissionJunction;
         $this->_username = $username;
-        $this->_password = $password;
+        $this->_password = $passwordApi;
         $this->_passwordApi = $passwordApi;
         $this->_website_id = $website_id;
+        $this->login( $this->_username, $this->_password ,$idSite);
         // $this->_apiClient = \ApiClient::factory(PROTOCOL_JSON);
     }
 
     /**
      * @return bool
      */
-    public function checkLogin(): bool
+    public function login(string $username, string $password,string $idSite=''): bool
     {
+        $this->_logged = false;
+        if (isNullOrEmpty( $username ) && isNullOrEmpty( $password )) {
+
+            return false;
+        }
+        $this->_username = $username;
+        $this->_password = $password;
+        $this->_passwordApi= $password;
         $credentials = array();
         $credentials["user"] = $this->_username;
-        $credentials["password"] = $this->_password;
         $credentials["apipassword"] = $this->_passwordApi;
-
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
-            return true;
+            $this->_logged = true;
         }
 
-        return false;
+        return $this->_logged;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkLogin() : bool
+    {
+        return $this->_logged;
     }
 
     /**
@@ -127,8 +142,14 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
     {
         $arrResult = array();
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
-        foreach ($transcationList as $transaction) {
+        if (count( $arrMerchantID ) < 1) {
+            $merchants = $this->getMerchants();
+            foreach ($merchants as $merchant) {
+                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+            }
+        }
+        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom,$dateTo);
+        foreach($transcationList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
@@ -187,6 +208,8 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_passwordApi));
         $curl_results = curl_exec($ch);

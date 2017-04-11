@@ -43,7 +43,7 @@ class EffiliationEx extends EffiliationOara{
                     if ($transactionExportArray[9] == 'Attente') {
                         $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
                     } else
-                        if ($transactionExportArray[9] == 'Refusé') {
+                        if ($transactionExportArray[9] == 'RefusÃ©') {
                             $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
                         }
                 $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);

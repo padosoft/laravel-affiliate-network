@@ -4,7 +4,7 @@ use Padosoft\AffiliateNetwork\Networks\CommissionJunction;
 // Include config
 include_once 'config.php';
 
-$CommissionJunction = new CommissionJunction($_ENV['COMMISSIONJUNCTION_USERNAME'], $_ENV['COMMISSIONJUNCTION_PASSWORD'], $_ENV['COMMISSIONJUNCTION_PASSWORD_API'], $_ENV['COMMISSIONJUNCTION_WEBSITEID']);
+$CommissionJunction = new CommissionJunction($_ENV['COMMISSIONJUNCTION_USERNAME'], $_ENV['COMMISSIONJUNCTION_PASSWORD_API'], $_ENV['COMMISSIONJUNCTION_WEBSITEID']);
 $isLogged = $CommissionJunction->checkLogin();
 if($isLogged) {
 
@@ -23,11 +23,11 @@ if($isLogged) {
      */
 
     echo '<h1>Sales</h1>';
-    $merchantList = array(
+    $merchantList = array(/*
         '11078' => array('cid' => '11078', 'name' => 'Yeppon IT'),
         '2725' => array('cid' => '2725', 'name' => 'Meridiana IT')
-    );
-    $sales = $CommissionJunction->getSales(new DateTime('2015-10-17'), new DateTime('2016-11-15'), $merchantList);
+    */);
+    $sales = $CommissionJunction->getSales(new DateTime('2017-04-01'), new DateTime('2017-04-02'), $merchantList);
     echo '<pre>';
     var_dump($sales);
     echo '</pre>';
