@@ -59,6 +59,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_passwordApi= $password;
         $credentials = array();
         $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_username;
         $credentials["apipassword"] = $this->_passwordApi;
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
