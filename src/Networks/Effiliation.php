@@ -9,6 +9,7 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\DealsResultset;
+use Padosoft\AffiliateNetwork\ProductsResultset;
 
 // require "../vendor/fubralimited/php-oara/Oara/Network/Publisher/Effiliation/Zapi/ApiClient.php";
 
@@ -177,6 +178,18 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+
+    /**
+     * @param  array $params
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $params = []): ProductsResultset
+    {
+        // TODO: Implement getProducts() method.
+        throw new \Exception("Not implemented yet");
     }
 
     public function getTrackingParameter(){

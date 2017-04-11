@@ -3,6 +3,8 @@
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\DealsResultset;
+use Padosoft\AffiliateNetwork\Product;
+use Padosoft\AffiliateNetwork\ProductsResultset;
 use Padosoft\AffiliateNetwork\Transaction;
 use Padosoft\AffiliateNetwork\Merchant;
 use Padosoft\AffiliateNetwork\Stat;
@@ -252,6 +254,100 @@ class Zanox extends AbstractNetwork implements NetworkInterface
 
         return array($Stat);
         */
+    }
+
+    /**
+     * @param  array $params  this array can contains these keys
+     *                        string      query          search string
+     *                        string      searchType     search type (optional) (contextual or phrase)
+     *                        string      region         limit search to region (optional)
+     *                        int         categoryId     limit search to categorys (optional)
+     *                        array       programId      limit search to program list of programs (optional)
+     *                        boolean     hasImages      products with images (optional)
+     *                        float       minPrice       minimum price (optional)
+     *                        float       maxPrice       maximum price (optional)
+     *                        int         adspaceId      adspace id (optional)
+     *                        int         page           page of result set (optional)
+     *                        int         items          items per page (optional)
+     *
+     * @return ProductsResultset
+     */
+    public function getProducts(array $params = []): ProductsResultset
+    {
+        $_params = array_merge([
+            'query' => null,
+            'searchType' => null,
+            'query' => null,
+            'searchType' => null,
+            'region' => null,
+            'categoryId' => null,
+            'programId' => null,
+            'hasImages' => null,
+            'minPrice' => null,
+            'maxPrice' => null,
+            'adspaceId' => null,
+            'page' => 0,
+            'items' => 10
+        ], $params);
+        $products =  $this->_network->getProducts($_params);
+        $set = ProductsResultset::createInstance();
+        if (!property_exists($products, 'productItems') || !property_exists($products->productItems, 'productItem'))
+        {
+            return ProductsResultset::createInstance();
+        }
+
+        $set->page = $products->page;
+        $set->items = $products->items;
+        $set->total = $products->total;
+
+        foreach ($products->productItems->productItem as $productItem) {
+            $Product = Product::createInstance();
+            if (property_exists($productItem, 'name')) {
+                $Product->name = $productItem->name;//'Danava',
+            }
+            if (property_exists($productItem, 'modified')) {
+                $Product->modified = $productItem->modified; //'2016-11-24T11:52:03Z',
+            }
+            if (property_exists($productItem, 'program')) {
+                $Product->merchant_ID = $productItem->program->id; //'Twelve Thirteen DE'
+                $Product->merchant_name = $productItem->program->_; //17434,
+            }
+            if (property_exists($productItem, 'price'))
+                $Product->price = $productItem->price; //129.0
+            if (property_exists($productItem, 'currency'))
+                $Product->currency = $productItem->currency; //'EUR'
+            if (property_exists($productItem, 'trackingLinks') && property_exists($productItem->trackingLinks, 'trackingLink')) {
+                $Product->ppv = $productItem->trackingLinks->trackingLink[0]->ppv;
+                $Product->ppc = $productItem->trackingLinks->trackingLink[0]->ppc;
+                $Product->adspaceId = $productItem->trackingLinks->trackingLink[0]->adspaceId;
+            }
+            if (property_exists($productItem, 'description'))
+                $Product->description = $productItem->description; //'Rosegold trifft auf puristisches Schwarz ? aufwendige und traditionelle Makramee Technik trifft auf Eleganz. Das neue Danava Buddha Armband besteht aus schwarzem Onyx, dieser Edelstein wird sehr gerne als Schmuckstein verwendet und viel lieber getragen. Der feingearbeitete rosegoldene Buddha verleiht diesem Armband einen fernöstlichen Stil. Es lässt sich wunderbar zu allen Anlässen Tragen und zu vielen Outfits kombinieren, da es Eleganz ausstrahlt. Das Symbol des Buddhas ist besonders in dieser Saison sehr gefragt.',
+            if (property_exists($productItem, 'manufacturer'))
+                $Product->manufacturer = $productItem->manufacturer; //'Twelve Thirteen Jewelry'
+            if (property_exists($productItem, 'ean'))
+                $Product->ean = $productItem->ean; //'0796716271505'
+            if (property_exists($productItem, 'deliveryTime'))
+                $Product->deliveryTime = $productItem->deliveryTime; //'1-3 Tage'
+            if (property_exists($productItem, 'priceOld'))
+                $Product->priceOld = $productItem->priceOld; //0.0
+            if (property_exists($productItem, 'shippingCosts'))
+                $Product->shippingCosts = $productItem->shippingCosts; //'0.0'
+            if (property_exists($productItem, 'shipping'))
+                $Product->shipping = $productItem->shipping; // '0.0'
+            if (property_exists($productItem, 'merchantCategory'))
+                $Product->merchantCategory = $productItem->merchantCategory; //'Damen / Damen Armbänder / Buddha Armbänder'
+            if (property_exists($productItem, 'merchantProductId'))
+                $Product->merchantProductId = $productItem->merchantProductId; //'BR018.M'
+            if (property_exists($productItem, 'id'))
+                $Product->id = $productItem->id; //'1ed7c3b4ab79cdbbf127cb78ec2aaff4'
+            if (property_exists($productItem, 'image') && property_exists($productItem->image, 'large')) {
+                $Product->image = $productItem->image->large;
+            }
+            $set->products[] = $Product;
+        }
+
+        return $set;
     }
 
     public function getTrackingParameter(){
