@@ -174,8 +174,8 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
-            $Transaction->custom_ID = $transaction['aid'];
-            $Transaction->unique_ID = $transaction['commission-id'];
+            $Transaction->custom_ID = $transaction['custom_id'];
+            $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->transaction_ID = $transaction['order-id'];
             $Transaction->commission = $transaction['commission'];
             if (!empty($transaction['date'])) {
