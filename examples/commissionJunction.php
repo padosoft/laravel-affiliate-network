@@ -13,9 +13,9 @@ if($isLogged) {
      */
 
     echo '<h1>Merchants list</h1>';
-    $merchantList = $CommissionJunction->getMerchants();
+    //$merchantList = $CommissionJunction->getMerchants();
     echo '<pre>';
-    var_dump($merchantList);
+    // var_dump($merchantList);
     echo '</pre>';
 
     /**
@@ -23,11 +23,15 @@ if($isLogged) {
      */
 
     echo '<h1>Sales</h1>';
-    $merchantList = array(/*
-        '11078' => array('cid' => '11078', 'name' => 'Yeppon IT'),
-        '2725' => array('cid' => '2725', 'name' => 'Meridiana IT')
-    */);
-    $sales = $CommissionJunction->getSales(new DateTime('2017-04-01'), new DateTime('2017-04-02'), $merchantList);
+    $merchantList = array(
+        //'1124214' => array('cid' => '1124214', 'name' => 'zChocolat.com'),
+        //'1911025' => array('cid' => '1911025', 'name' => 'Accorhotels.com Europe & ROW'),
+        //'2143811' => array('cid' => '2143811', 'name' => 'Norton by Symantec - France'),
+        //'3350997' => array('cid' => '3350997', 'name' => 'Kaspersky France'),
+        //'2446763' => array('cid' => '2446763', 'name' => 'Abritel FR'),
+        //'2683708' => array('cid' => '2683708', 'name' => 'LightInTheBox')
+    );
+    $sales = $CommissionJunction->getSales(new DateTime('2017-04-10'), new DateTime('2017-04-10'), $merchantList);
     echo '<pre>';
     var_dump($sales);
     echo '</pre>';
@@ -52,13 +56,13 @@ if($isLogged) {
     echo '<h1>Deals</h1>';
     $deals = $CommissionJunction->getDeals();
     echo '<pre>';
-    var_dump($deals);
+    //var_dump($deals);
     echo '</pre>';
 
-    echo '<h1>Single deal merchant id = 3857130</h1>';
-    $deals = $CommissionJunction->getDeals(3857130);
+    echo '<h1>Single deal merchant id = 2143811 (Norton by Symantec - France)</h1>';
+    $deals = $CommissionJunction->getDeals(2143811);
     echo '<pre>';
-    var_dump($deals);
+    //var_dump($deals);
     echo '</pre>';
 
 }

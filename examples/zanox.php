@@ -23,7 +23,7 @@ if($isLogged) {
      *Sales list
      */
 
-    /*
+
     echo '<h1>Sales</h1>';
     $merchantList = array(
         '11078' => array('cid' => '11078', 'name' => 'Yeppon IT'),
@@ -33,7 +33,7 @@ if($isLogged) {
     echo '<pre>';
     var_dump($sales);
     echo '</pre>';
-    */
+
 
     /**
      * Stats list

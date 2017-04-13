@@ -67,6 +67,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
+        $this->_logged = true;
         return $this->_logged;
     }
 
@@ -158,31 +159,35 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
-        if (!$this->checkLogin()) {
-            return array();
-        }
-        $arrResult = array();
-        if (count( $arrMerchantID ) < 1) {
-            $merchants = $this->getMerchants();
-            foreach ($merchants as $merchant) {
-                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+        try {
+            if (!$this->checkLogin()) {
+                return array();
             }
-        }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
-        foreach($transcationList as $transaction) {
-            $Transaction = Transaction::createInstance();
-            $Transaction->currency = $transaction['currency'];
-            $Transaction->status = $transaction['status'];
-            $Transaction->amount = $transaction['amount'];
-            $Transaction->custom_ID = $transaction['custom_id'];
-            $Transaction->title = $transaction['title'];
-            $Transaction->unique_ID = $transaction['unique_id'];
-            $Transaction->commission = $transaction['commission'];
-            $date = new \DateTime($transaction['date']);
-            $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-            $Transaction->merchant_ID = $transaction['merchantId'];
-            $Transaction->approved = $transaction['approved'];
-            $arrResult[] = $Transaction;
+            $arrResult = array();
+            if (count( $arrMerchantID ) < 1) {
+                $merchants = $this->getMerchants();
+                foreach ($merchants as $merchant) {
+                    $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+                }
+            }
+            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+            foreach($transcationList as $transaction) {
+                $Transaction = Transaction::createInstance();
+                $Transaction->currency = $transaction['currency'];
+                $Transaction->status = $transaction['status'];
+                $Transaction->amount = $transaction['amount'];
+                $Transaction->custom_ID = $transaction['custom_id'];
+                $Transaction->title = $transaction['title'];
+                $Transaction->unique_ID = $transaction['unique_id'];
+                $Transaction->commission = $transaction['commission'];
+                $date = new \DateTime($transaction['date']);
+                $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
+                $Transaction->merchant_ID = $transaction['merchantId'];
+                $Transaction->approved = $transaction['approved'];
+                $arrResult[] = $Transaction;
+            }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
 
         return $arrResult;
