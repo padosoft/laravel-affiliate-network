@@ -157,28 +157,32 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }*/
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
 
-        foreach ($transcationList as $transaction)  {
-            $myTransaction = Array();
-            $myTransaction['merchantId'] = $transaction->advertiserId;
-            $myTransaction['date'] = $transaction->transactionDate;
-            $myTransaction['unique_id'] = $transaction->id;
-            $myTransaction['custom_id'] = $transaction->paymentId;
+        try {
+            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
 
-            if ($transaction->commissionStatus == 'approved') {
-                $myTransaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-            } else if ($transaction->commissionStatus == 'pending') {
-                $myTransaction['status'] = \Oara\Utilities::STATUS_PENDING;
-            } else if ($transaction->commissionStatus == 'pending') {
-                $myTransaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+            foreach ($transcationList as $transaction)  {
+                $myTransaction = Array();
+                $myTransaction['merchantId'] = $transaction->advertiserId;
+                $myTransaction['date'] = $transaction->transactionDate;
+                $myTransaction['unique_id'] = $transaction->id;
+                $myTransaction['custom_id'] = $transaction->paymentId;
+
+                if ($transaction->commissionStatus == 'approved') {
+                    $myTransaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                } else if ($transaction->commissionStatus == 'pending') {
+                    $myTransaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                } else if ($transaction->commissionStatus == 'pending') {
+                    $myTransaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                }
+                //echo $transaction->saleAmount->amount."<br>";
+                $myTransaction['amount'] = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
+                $myTransaction['commission'] = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
+                $arrResult[] = $myTransaction;
             }
-            //echo $transaction->saleAmount->amount."<br>";
-            $myTransaction['amount'] = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
-            $myTransaction['commission'] = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
-            $arrResult[] = $myTransaction;
+        } catch (\Exception $e) {
+            throw new Exception($e);
         }
-
         return $arrResult;
     }
 
