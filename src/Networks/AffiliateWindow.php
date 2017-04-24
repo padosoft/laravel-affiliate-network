@@ -159,16 +159,18 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         }*/
 
         try {
+            echo "stepA";
             $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-
+            echo "stepB";
             if (is_array($transcationList)) {
+                echo "stepC";
                 foreach ($transcationList as $transaction) {
                     $myTransaction = Array();
                     $myTransaction['merchantId'] = $transaction->advertiserId;
                     $myTransaction['date'] = $transaction->transactionDate;
                     $myTransaction['unique_id'] = $transaction->id;
                     $myTransaction['custom_id'] = $transaction->paymentId;
-
+                    $myTransaction['custom_id'] = $this->_network->null;
                     if ($transaction->commissionStatus == 'approved') {
                         $myTransaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
                     } else if ($transaction->commissionStatus == 'pending') {
@@ -182,8 +184,10 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                     $arrResult[] = $myTransaction;
                 }
             }
+            echo "stepD";
         } catch (\Exception $e) {
-            //throw new Exception($e);
+            //throw new \Exception($e);
+            echo "stepE";
             echo "<br><br>errore: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
         }
