@@ -143,13 +143,14 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
             $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->custom_ID = $transaction['custom_id'];
-            $Transaction->status = $transaction['status'];
+            //var_dump($transaction);
+            $Transaction->status = "mio_stato";//$transaction['status'];
             $Transaction->amount = $transaction['amount'];
             $Transaction->commission = $transaction['commission'];
             $Transaction->approved = false;
-            if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
+           /* if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
                 $Transaction->approved = true;
-            }
+            }*/
             $arrResult[] = $Transaction;
         }
 
