@@ -170,7 +170,6 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                     $myTransaction['date'] = $transaction->transactionDate;
                     $myTransaction['unique_id'] = $transaction->id;
                     $myTransaction['custom_id'] = $transaction->paymentId;
-                    $myTransaction['custom_id'] = $this->_network->null;
                     if ($transaction->commissionStatus == 'approved') {
                         $myTransaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
                     } else if ($transaction->commissionStatus == 'pending') {

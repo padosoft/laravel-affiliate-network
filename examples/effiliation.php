@@ -4,29 +4,26 @@ use Padosoft\AffiliateNetwork\Networks\Effiliation;
 // Include config
 include_once 'config.php';
 
-$Effiliation = new Effiliation($_ENV['EFFILIATION_PASSWORD']);
+$Effiliation = new Effiliation($_ENV['EFFILIATION_PASSWORD'],$_ENV['EFFILIATION_PASSWORD'],$_ENV['EFFILIATION_PASSWORD']);
 $isLogged = $Effiliation->checkLogin();
 if($isLogged) {
 
     /**
      * Merchants List
      */
-
+/*
     echo '<h1>Merchants list</h1>';
     $merchantList = $Effiliation->getMerchants();
     echo '<pre>';
     var_dump($merchantList);
     echo '</pre>';
-
-    /**
-     *Sales list
-     */
+*/
 
     echo '<h1>Sales</h1>';
     $merchantList = array(
-        '315012692' => array('cid' => '315012692', 'name' => 'Carla Bikini IT - Coupon')
+        '315012245' => array('cid' => '315012245', 'name' => 'Boulanger '),
     );
-    $sales = $Effiliation->getSales(new DateTime('2016-10-17'), new DateTime('2016-11-15'), $merchantList);
+    $sales = $Effiliation->getSales(new DateTime('2017-03-25'), new DateTime('2017-04-17'), $merchantList);
     echo '<pre>';
     var_dump($sales);
     echo '</pre>';
@@ -46,7 +43,7 @@ if($isLogged) {
     /**
      * Deals
      */
-
+/*
     echo '<h1>Deals</h1>';
     $deals = $Effiliation->getDeals();
     echo '<pre>';
@@ -58,5 +55,5 @@ if($isLogged) {
     echo '<pre>';
     var_dump($deals);
     echo '</pre>';
-
+*/
 }

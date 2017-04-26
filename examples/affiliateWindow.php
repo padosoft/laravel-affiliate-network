@@ -18,64 +18,70 @@ use Padosoft\AffiliateNetwork\Networks\AffiliateWindow;
 // Include config
 include_once 'config.php';
 
-$AffiliateWindowEx = new AffiliateWindow($_ENV['AFFILIATEWINDOW_API_USERNAME'], $_ENV['AFFILIATEWINDOW_API_PASSWORD']);
-$isLogged = $AffiliateWindowEx->checkLogin();
-if($isLogged) {
-    /**
-     * Merchants List
-     */
+try {
 
-/*
-    echo '<h1>Merchants list</h1>';
-    $merchantList = $AffiliateWindowEx->getMerchants();
-    echo '<pre>';
-    var_dump($merchantList);
-    echo '</pre>';
-*/
-
-    /**
-     *Sales list
-     */
-
-
-    echo '<h1>Sales</h1>';
-    $merchantList = array(
-        //'11078' => array('cid' => '11078', 'name' => 'Yeppon IT'),
-        //'2725' => array('cid' => '2725', 'name' => 'Meridiana IT')
-    );
-    $sales = $AffiliateWindowEx->getSales(new DateTime('2017-02-20 12:30:00'), new DateTime('2017-02-21 14:15:00'), $merchantList);
-    echo '<pre>';
-    var_dump($sales);
-    echo '</pre>';
-
-
-    /**
-     * Stats list
-     */
+    $AffiliateWindowEx = new AffiliateWindow($_ENV['AFFILIATEWINDOW_API_USERNAME'], $_ENV['AFFILIATEWINDOW_API_PASSWORD']);
+    $isLogged = $AffiliateWindowEx->checkLogin();
+    if($isLogged) {
+        /**
+         * Merchants List
+         */
 
     /*
-    echo '<h1>Stats</h1>';
-    $stats = $Zanox->getStats(new DateTime('2016-10-14'), new DateTime('2016-11-15'));
-    echo '<pre>';
-    var_dump($stats);
-    echo '</pre>';
+        echo '<h1>Merchants list</h1>';
+        $merchantList = $AffiliateWindowEx->getMerchants();
+        echo '<pre>';
+        var_dump($merchantList);
+        echo '</pre>';
     */
 
-    /**
-     * Deals
-     */
-/*
-    echo '<h1>Deals</h1>';
-    $deals = $Zanox->getDeals();
-    echo '<pre>';
-    var_dump($deals);
-    echo '</pre>';
+        /**
+         *Sales list
+         */
 
-    echo '<h1>Single deal merchant id = 7853</h1>';
-    $deals = $Zanox->getDeals(7853);
-    echo '<pre>';
-    var_dump($deals);
-    echo '</pre>';
-*/
 
-} else echo "login failed";
+        echo '<h1>Sales</h1>';
+        $merchantList = array(
+            //'11078' => array('cid' => '11078', 'name' => 'Yeppon IT'),
+            //'2725' => array('cid' => '2725', 'name' => 'Meridiana IT')
+        );
+        $sales = $AffiliateWindowEx->getSales(new DateTime('2017-04-21 12:30:00'), new DateTime('2017-04-24 14:15:00'), $merchantList);
+        echo '<pre>';
+        var_dump($sales);
+        echo '</pre>';
+
+
+        /**
+         * Stats list
+         */
+
+        /*
+        echo '<h1>Stats</h1>';
+        $stats = $Zanox->getStats(new DateTime('2016-10-14'), new DateTime('2016-11-15'));
+        echo '<pre>';
+        var_dump($stats);
+        echo '</pre>';
+        */
+
+        /**
+         * Deals
+         */
+    /*
+        echo '<h1>Deals</h1>';
+        $deals = $Zanox->getDeals();
+        echo '<pre>';
+        var_dump($deals);
+        echo '</pre>';
+
+        echo '<h1>Single deal merchant id = 7853</h1>';
+        $deals = $Zanox->getDeals(7853);
+        echo '<pre>';
+        var_dump($deals);
+        echo '</pre>';
+    */
+
+    } else echo "login failed";
+} catch (\Exception $e) {
+    echo "errore: ".$e->getMessage()."<br><br><br><br>";
+    var_dump($e->getTraceAsString());
+}
