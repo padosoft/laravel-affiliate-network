@@ -127,31 +127,46 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
         $arrResult = array();
-        if (count( $arrMerchantID ) < 1) {
-            $merchants = $this->getMerchants();
-            foreach ($merchants as $merchant) {
-                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+        try {
+            if (count( $arrMerchantID ) < 1) {
+                $merchants = $this->getMerchants();
+                foreach ($merchants as $merchant) {
+                    $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+                }
             }
-        }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-        foreach($transcationList as $transaction) {
-            $Transaction = Transaction::createInstance();
-            $Transaction->merchant_ID = $transaction['merchantId'];
-            $Transaction->title ='';
-            $Transaction->currency ='EUR';
-            $date = new \DateTime($transaction['date']);
-            $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-            $Transaction->unique_ID = $transaction['unique_id'];
-            $Transaction->custom_ID = $transaction['custom_id'];
-            //var_dump($transaction);
-            $Transaction->status = "mio_stato";//$transaction['status'];
-            $Transaction->amount = $transaction['amount'];
-            $Transaction->commission = $transaction['commission'];
-            $Transaction->approved = false;
-           /* if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
-                $Transaction->approved = true;
-            }*/
-            $arrResult[] = $Transaction;
+            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+
+            foreach($transcationList as $transaction) {
+                $myTransaction = Transaction::createInstance();
+                try {
+                    $myTransaction->merchant_ID = $transaction['merchantId'];
+                    $myTransaction->title ='';
+                    $myTransaction->currency ='EUR';
+                    $date = new \DateTime($transaction['date']);
+                    $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                    $myTransaction->unique_ID = $transaction['unique_id'];
+                    $myTransaction->custom_ID = $transaction['custom_id'];
+                    //var_dump($transaction);
+                    $myTransaction->status = $transaction['status'];
+                    $myTransaction->amount = $transaction['amount'];
+                    $myTransaction->commission = $transaction['commission'];
+                    $myTransaction->approved = false;
+                    if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
+                        $myTransaction->approved = true;
+                    }
+                    $arrResult[] = $myTransaction;
+                } catch (\Exception $e) {
+                    //echo "stepE ";
+                    echo "<br><br>errore transazione effilitation, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                    var_dump($e->getTraceAsString());
+                    //throw new \Exception($e);
+                }
+            }
+        } catch (\Exception $e) {
+            //echo "stepE ";
+            echo "<br><br>errore generico transazione effiliation: ".$e->getMessage()."<br><br>";
+            var_dump($e->getTraceAsString());
+            throw new \Exception($e);
         }
 
         return $arrResult;
