@@ -159,11 +159,11 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         }*/
 
         try {
-            echo "stepA";
+            echo "stepA ";
             $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-            echo "stepB";
+            echo "stepB ";
             if (is_array($transcationList)) {
-                echo "stepC";
+                echo "stepC ";
                 foreach ($transcationList as $transaction) {
                     $myTransaction = Array();
                     $myTransaction['merchantId'] = $transaction->advertiserId;
@@ -183,10 +183,10 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                     $arrResult[] = $myTransaction;
                 }
             }
-            echo "stepD";
+            echo "stepD ";
         } catch (\Exception $e) {
             //throw new \Exception($e);
-            echo "stepE";
+            echo "stepE ";
             echo "<br><br>errore: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
         }
