@@ -185,10 +185,10 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             }
             echo "stepD ";
         } catch (\Exception $e) {
-            //throw new \Exception($e);
             echo "stepE ";
             echo "<br><br>errore: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
+            throw new \Exception($e);
         }
         return $arrResult;
     }
