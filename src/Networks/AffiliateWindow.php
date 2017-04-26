@@ -165,22 +165,28 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             if (is_array($transcationList)) {
                 //echo "stepC ";
                 foreach ($transcationList as $transaction) {
-                    $Transaction = Transaction::createInstance();
-                    $Transaction->merchant_ID = $transaction->advertiserId;
-                    $Transaction->date = $transaction->transactionDate;
-                    $Transaction->unique_id = $transaction->id;
-                    $Transaction->custom_id = $transaction->paymentId;
+                    $myTransaction = Transaction::createInstance();
+                    $myTransaction->merchant_ID = $transaction->advertiserId;
+                    $myTransaction->date = $transaction->transactionDate;
+                    //echo $transaction->transactionDate."<br>";
+                    if (!empty($transaction->transactionDate)) {
+                        $date = new \DateTime($transaction->transactionDate);
+                        $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                        //var_dump($date);
+                    }
+                    $myTransaction->unique_id = $transaction->id;
+                    $myTransaction->custom_id = $transaction->paymentId;
                     if ($transaction->commissionStatus == 'approved') {
-                        $Transaction->status = \Oara\Utilities::STATUS_CONFIRMED;
+                        $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
                     } else if ($transaction->commissionStatus == 'pending') {
-                        $Transaction->status = \Oara\Utilities::STATUS_PENDING;
+                        $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
                     } else if ($transaction->commissionStatus == 'pending') {
-                        $Transaction->status = \Oara\Utilities::STATUS_DECLINED;
+                        $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
                     }
                     //echo $transaction->saleAmount->amount."<br>";
-                    $Transaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
-                    $Transaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
-                    $arrResult[] = $Transaction;
+                    $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
+                    $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
+                    $arrResult[] = $myTransaction;
                 }
             }
             //echo "stepD ";
