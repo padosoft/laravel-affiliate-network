@@ -176,8 +176,13 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                             //var_dump($date);
                         }
                         $myTransaction->unique_ID = $transaction->id;
-                        if (is_array($transaction->clickRefs) && $transaction->clickRefs->clickRef != null)
-                            $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
+                        if (is_object($transaction->clickRefs)) {
+                            if (property_exists($transaction->clickRefs,'clickRef') && $transaction->clickRefs->clickRef != null)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
+                            else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
+                        }
+
                         if ($transaction->commissionStatus == 'approved') {
                             $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
                         } else if ($transaction->commissionStatus == 'pending') {
