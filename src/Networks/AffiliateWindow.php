@@ -26,7 +26,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
     private $_username = '';
     private $_password = '';
     private $_logged    = false;
-    protected $_tracking_parameter    = 'epi';
+    protected $_tracking_parameter    = 'clickref';
 
     /**
      * @method __construct
@@ -176,7 +176,8 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                             //var_dump($date);
                         }
                         $myTransaction->unique_ID = $transaction->id;
-                        $myTransaction->custom_ID = $transaction->paymentId;
+                        if (is_array($transaction->clickRefs) && $transaction->clickRefs->clickRef != null)
+                            $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
                         if ($transaction->commissionStatus == 'approved') {
                             $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
                         } else if ($transaction->commissionStatus == 'pending') {
