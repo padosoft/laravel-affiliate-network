@@ -166,33 +166,40 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                 //echo "stepC ";
                 foreach ($transcationList as $transaction) {
                     $myTransaction = Transaction::createInstance();
-                    $myTransaction->merchant_ID = $transaction->advertiserId;
-                    $myTransaction->date = $transaction->transactionDate;
-                    //echo $transaction->transactionDate."<br>";
-                    if (!empty($transaction->transactionDate)) {
-                        $date = new \DateTime($transaction->transactionDate);
-                        $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
-                        //var_dump($date);
+                    try {
+                        $myTransaction->merchant_ID = $transaction->advertiserId;
+                        $myTransaction->date = $transaction->transactionDate;
+                        //echo $transaction->transactionDate."<br>";
+                        if (!empty($transaction->transactionDate)) {
+                            $date = new \DateTime($transaction->transactionDate);
+                            $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                            //var_dump($date);
+                        }
+                        $myTransaction->unique_ID = $transaction->id;
+                        $myTransaction->custom_ID = $transaction->paymentId;
+                        if ($transaction->commissionStatus == 'approved') {
+                            $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
+                        } else if ($transaction->commissionStatus == 'pending') {
+                            $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
+                        } else if ($transaction->commissionStatus == 'pending') {
+                            $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
+                        }
+                        //echo $transaction->saleAmount->amount."<br>";
+                        $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
+                        $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
+                        $arrResult[] = $myTransaction;
+                    } catch (\Exception $e) {
+                        //echo "stepE ";
+                        echo "<br><br>errore transazione AffiliateWindow, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                        var_dump($e->getTraceAsString());
+                        //throw new \Exception($e);
                     }
-                    $myTransaction->unique_id = $transaction->id;
-                    $myTransaction->custom_id = $transaction->paymentId;
-                    if ($transaction->commissionStatus == 'approved') {
-                        $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else if ($transaction->commissionStatus == 'pending') {
-                        $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                    } else if ($transaction->commissionStatus == 'pending') {
-                        $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
-                    }
-                    //echo $transaction->saleAmount->amount."<br>";
-                    $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
-                    $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
-                    $arrResult[] = $myTransaction;
                 }
             }
             //echo "stepD ";
         } catch (\Exception $e) {
             //echo "stepE ";
-            echo "<br><br>errore: ".$e->getMessage()."<br><br>";
+            echo "<br><br>errore generico transazione AffiliateWindow: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
         }
