@@ -181,8 +181,8 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                     $myTransaction->title = $transaction['title'];
                     $myTransaction->unique_ID = $transaction['unique_id'];
                     $myTransaction->commission = $transaction['commission'];
-                    if (!empty($transaction->date)) {
-                        $date = new \DateTime($transaction->date);
+                    if (!empty($transaction['date'])) {
+                        $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date;
                     }
                     $myTransaction->merchant_ID = $transaction['merchantId'];
