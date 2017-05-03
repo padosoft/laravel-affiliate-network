@@ -172,19 +172,27 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
             }
             $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
             foreach($transcationList as $transaction) {
-                $Transaction = Transaction::createInstance();
-                $Transaction->currency = $transaction['currency'];
-                $Transaction->status = $transaction['status'];
-                $Transaction->amount = $transaction['amount'];
-                $Transaction->custom_ID = $transaction['custom_id'];
-                $Transaction->title = $transaction['title'];
-                $Transaction->unique_ID = $transaction['unique_id'];
-                $Transaction->commission = $transaction['commission'];
-                $date = new \DateTime($transaction['date']);
-                $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-                $Transaction->merchant_ID = $transaction['merchantId'];
-                $Transaction->approved = $transaction['approved'];
-                $arrResult[] = $Transaction;
+                try {
+                    $myTransaction = Transaction::createInstance();
+                    $myTransaction->currency = $transaction['currency'];
+                    $myTransaction->status = $transaction['status'];
+                    $myTransaction->amount = $transaction['amount'];
+                    $myTransaction->custom_ID = $transaction['custom_id'];
+                    $myTransaction->title = $transaction['title'];
+                    $myTransaction->unique_ID = $transaction['unique_id'];
+                    $myTransaction->commission = $transaction['commission'];
+                    if (!empty($transaction->date)) {
+                        $date = new \DateTime($transaction->date);
+                        $myTransaction->date = $date;
+                    }
+                    $myTransaction->merchant_ID = $transaction['merchantId'];
+                    $myTransaction->approved = $transaction['approved'];
+                    $arrResult[] = $myTransaction;
+                } catch (\Exception $e) {
+                    //echo "stepE ";
+                    echo "<br><br>errore transazione Publicideas, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                    //var_dump($e->getTraceAsString());
+                }
             }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
