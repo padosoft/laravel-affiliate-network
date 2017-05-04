@@ -171,8 +171,13 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                 }
             }
             $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+            $i=0;
             foreach($transcationList as $transaction) {
                 try {
+                    $i++;
+                    if ($i<6)
+                        echo "transaction[date]: ".$transaction['date']."<br>";
+
                     $myTransaction = Transaction::createInstance();
                     $myTransaction->currency = $transaction['currency'];
                     $myTransaction->status = $transaction['status'];
@@ -184,6 +189,8 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                     if (!empty($transaction['date'])) {
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date;
+                        if ($i<3)
+                            var_dump($myTransaction->date);
                     }
                     $myTransaction->merchant_ID = $transaction['merchantId'];
                     $myTransaction->approved = $transaction['approved'];
