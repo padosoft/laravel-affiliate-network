@@ -165,8 +165,9 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             if (is_array($transcationList)) {
                 //echo "stepC ";
                 foreach ($transcationList as $transaction) {
-                    $myTransaction = Transaction::createInstance();
                     try {
+                        $myTransaction = Transaction::createInstance();
+
                         $myTransaction->merchant_ID = $transaction->advertiserId;
                         $myTransaction->date = $transaction->transactionDate;
                         //echo $transaction->transactionDate."<br>";

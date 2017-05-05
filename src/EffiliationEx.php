@@ -33,7 +33,7 @@ class EffiliationEx extends EffiliationOara{
                 $transaction['date'] = $transactionExportArray[10];
                 $transaction['unique_id'] = $transactionExportArray[0];
                 $transaction['custom_id'] = '';
-                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                $transaction['status'] = null;
                 if ($transactionExportArray[4] != null) {
                     $transaction['custom_id'] = $transactionExportArray[4];
                 }

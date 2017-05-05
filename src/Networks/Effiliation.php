@@ -71,8 +71,14 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     {
         $arrResult = array();
         $url = 'http://api.effiliation.com/apiv2/programs.xml?key=' . $this->_password . "&filter=all";
+        echo "effiliation url ",PHP_EOL;
+        //var_dump($url);
         $content = @\file_get_contents($url);
+        echo "effiliation content",PHP_EOL;
+        //var_dump($content);
         $xml = \simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
+        echo "effiliation XML ",PHP_EOL;
+        //var_dump($xml);
         foreach ($xml->program as $merchant) {
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = (string)$merchant->id_programme;
@@ -142,8 +148,11 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
                     $myTransaction->merchant_ID = $transaction['merchantId'];
                     $myTransaction->title ='';
                     $myTransaction->currency ='EUR';
-                    $date = new \DateTime($transaction['date']);
-                    $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                    //echo "txdate: ".$transaction['date']."<br>";
+                    if (!empty($transaction['date'])) {
+                        $date = new \DateTime($transaction['date']);
+                        $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                    }
                     $myTransaction->unique_ID = $transaction['unique_id'];
                     $myTransaction->custom_ID = $transaction['custom_id'];
                     //var_dump($transaction);
