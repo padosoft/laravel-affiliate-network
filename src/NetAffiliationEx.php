@@ -95,57 +95,65 @@ class NetAffiliationEx extends NetAffiliationOara
      */
     public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        try {
+            $totalTransactions = array();
+            $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
-        $valuesFormExport = array();
-        $valuesFormExport[] = new \Oara\Curl\Parameter('authl', $this->_credentials["user"]);
-        $valuesFormExport[] = new \Oara\Curl\Parameter('authv', $this->_credentials["apiPassword"]);
-        $valuesFormExport[] = new \Oara\Curl\Parameter('champs', 'idprogramme,date,etat,argsite,montant,gains,monnaie,idsite,id');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('debut', $dStartDate->format("Y-m-d"));
-        $valuesFormExport[] = new \Oara\Curl\Parameter('fin', $dEndDate->format("Y-m-d"));
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('https://stat.netaffiliation.com/requete.php?', $valuesFormExport);
+            $valuesFormExport = array();
+            $valuesFormExport[] = new \Oara\Curl\Parameter('authl', $this->_credentials["user"]);
+            $valuesFormExport[] = new \Oara\Curl\Parameter('authv', $this->_credentials["apiPassword"]);
+            $valuesFormExport[] = new \Oara\Curl\Parameter('champs', 'idprogramme,date,etat,argsite,montant,gains,monnaie,idsite,id');
+            $valuesFormExport[] = new \Oara\Curl\Parameter('debut', $dStartDate->format("Y-m-d"));
+            $valuesFormExport[] = new \Oara\Curl\Parameter('fin', $dEndDate->format("Y-m-d"));
+            $urls = array();
+            $urls[] = new \Oara\Curl\Request('https://stat.netaffiliation.com/requete.php?', $valuesFormExport);
 
-        $exportReport = $this->_client->get($urls);
+            $exportReport = $this->_client->get($urls);
 
 
 
-        //sales
-        $exportData = str_getcsv($exportReport[0], "\n");
-        $num = count($exportData);
-        for ($i = 1; $i < $num; $i++) {
-            $transactionExportArray = str_getcsv($exportData[$i], ";");
-            if (\count($this->_sitesAllowed) == 0 || \in_array($transactionExportArray[7], $this->_sitesAllowed)) {
-                if (count($merchantIdList)<1 || isset($merchantIdList[$transactionExportArray[0]])) {
-                    $transaction = Array();
-                    $transaction['merchantId'] = $transactionExportArray[0];
-                    //$transactionDate = \DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[1]);
-                    $transaction['date'] = $transactionExportArray[1];
-                    $transaction['title'] = '';
+            //sales
+            $exportData = str_getcsv($exportReport[0], "\n");
+            $num = count($exportData);
+            for ($i = 1; $i < $num; $i++) {
+                $transactionExportArray = str_getcsv($exportData[$i], ";");
+                if (\count($this->_sitesAllowed) == 0 || \in_array($transactionExportArray[7], $this->_sitesAllowed)) {
+                    if (count($merchantIdList)<1 || isset($merchantIdList[$transactionExportArray[0]])) {
+                        $transaction = Array();
+                        $transaction['merchantId'] = $transactionExportArray[0];
+                        //$transactionDate = \DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[1]);
+                        $transaction['date'] = $transactionExportArray[1];
+                        $transaction['title'] = '';
 
-                    if ($transactionExportArray[3] != null) {
-                        $transaction['custom_id'] = $transactionExportArray[3];
-                    }
-
-                    if (\strstr($transactionExportArray[2], 'v')) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else
-                        if (\strstr($transactionExportArray[2], 'r')) {
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                        } else if (\strstr($transactionExportArray[2], 'a')) {
-                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                        } else {
-                            throw new \Exception ("Status not found");
+                        if ($transactionExportArray[3] != null) {
+                            $transaction['custom_id'] = $transactionExportArray[3];
                         }
-                    $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[4]);
-                    $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
 
-                    $transaction['currency'] = $transactionExportArray[6];
-                    $transaction['unique_id'] = $transactionExportArray[8];
-                    $totalTransactions[] = $transaction;
+                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                        if (\strstr($transactionExportArray[2], 'v')) {
+                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        } else
+                            if (\strstr($transactionExportArray[2], 'r')) {
+                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                            } else if (\strstr($transactionExportArray[2], 'a')) {
+                                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                            } else {
+                                throw new \Exception ("Status not found");
+                            }
+                        $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[4]);
+                        $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
+
+                        $transaction['currency'] = $transactionExportArray[6];
+                        $transaction['unique_id'] = $transactionExportArray[8];
+                        $totalTransactions[] = $transaction;
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            //echo "stepE ";
+            echo PHP_EOL."NetAffiliationEx - getTransactionList err: ".$e->getMessage().PHP_EOL;
+            //var_dump($e->getTraceAsString());
+            throw new \Exception($e);
         }
         return $totalTransactions;
     }

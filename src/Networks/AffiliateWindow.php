@@ -184,6 +184,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                                 $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
                         }
 
+                        $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
                         if ($transaction->commissionStatus == 'approved') {
                             $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
                         } else if ($transaction->commissionStatus == 'pending') {

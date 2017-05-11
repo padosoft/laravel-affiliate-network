@@ -112,6 +112,7 @@ class TradeDoublerEx extends TradeDoublerOara
                         $transaction['custom_id'] = $transactionExportArray[9];
                     }
 
+                    $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
                     if ($transactionExportArray[11] == 'A') {
                         $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
                     } else

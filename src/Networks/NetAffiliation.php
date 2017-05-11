@@ -154,42 +154,53 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
      */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
-        if (!$this->checkLogin()) {
-            return array();
-        }
-        $arrResult = array();
-        if (count( $arrMerchantID ) < 1) {
-            $merchants = $this->getMerchants();
-            foreach ($merchants as $merchant) {
-                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+        try {
+            if (!$this->checkLogin()) {
+                return array();
             }
-        }
+            $arrResult = array();
+            if (count( $arrMerchantID ) < 1) {
+                $merchants = $this->getMerchants();
+                foreach ($merchants as $merchant) {
+                    $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
+                }
+            }
 
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-        foreach($transcationList as $transaction) {
-            $Transaction = Transaction::createInstance();
-            array_key_exists_safe( $transaction,
-                'currency' ) ? $Transaction->currency = $transaction['currency'] : $Transaction->currency = '';
-            array_key_exists_safe( $transaction,
-                'status' ) ? $Transaction->status = $transaction['status'] : $Transaction->status = '';
-            array_key_exists_safe( $transaction,
-                'amount' ) ? $Transaction->amount = $transaction['amount'] : $Transaction->amount = '';
-            array_key_exists_safe( $transaction,
-                'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
-            array_key_exists_safe( $transaction,
-                'title' ) ? $Transaction->title = $transaction['title'] : $Transaction->title = '';
-            array_key_exists_safe( $transaction,
-                'unique_id' ) ? $Transaction->unique_ID = $transaction['unique_id'] : $Transaction->unique_ID = '';
-            array_key_exists_safe( $transaction,
-                'commission' ) ? $Transaction->commission = $transaction['commission'] : $Transaction->commission = 0;
-            $date = new \DateTime( $transaction['date'] );
-            $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
-            array_key_exists_safe( $transaction,
-                'merchantId' ) ? $Transaction->merchant_ID = $transaction['merchantId'] : $Transaction->merchant_ID = '';
-            array_key_exists_safe( $transaction,
-                'approved' ) ? $Transaction->approved = $transaction['approved'] : $Transaction->approved = '';
-            $arrResult[] = $Transaction;
+            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+            foreach($transcationList as $transaction) {
+                try {
+                    $Transaction = Transaction::createInstance();
+                    array_key_exists_safe( $transaction,
+                        'currency' ) ? $Transaction->currency = $transaction['currency'] : $Transaction->currency = '';
+                    array_key_exists_safe( $transaction,
+                        'status' ) ? $Transaction->status = $transaction['status'] : $Transaction->status = '';
+                    array_key_exists_safe( $transaction,
+                        'amount' ) ? $Transaction->amount = $transaction['amount'] : $Transaction->amount = '';
+                    array_key_exists_safe( $transaction,
+                        'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
+                    array_key_exists_safe( $transaction,
+                        'title' ) ? $Transaction->title = $transaction['title'] : $Transaction->title = '';
+                    array_key_exists_safe( $transaction,
+                        'unique_id' ) ? $Transaction->unique_ID = $transaction['unique_id'] : $Transaction->unique_ID = '';
+                    array_key_exists_safe( $transaction,
+                        'commission' ) ? $Transaction->commission = $transaction['commission'] : $Transaction->commission = 0;
+                    $date = new \DateTime( $transaction['date'] );
+                    $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
+                    array_key_exists_safe( $transaction,
+                        'merchantId' ) ? $Transaction->merchant_ID = $transaction['merchantId'] : $Transaction->merchant_ID = '';
+                    array_key_exists_safe( $transaction,
+                        'approved' ) ? $Transaction->approved = $transaction['approved'] : $Transaction->approved = '';
+                    $arrResult[] = $Transaction;
+                } catch (\Exception $e) {
+                    //echo "stepE ";
+                    echo "<br><br>errore transazione NetAffiliation, id: ".$transaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                    //var_dump($e->getTraceAsString());
+                }
 
+            }
+
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
 
         return $arrResult;
