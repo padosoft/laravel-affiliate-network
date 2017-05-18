@@ -161,11 +161,15 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         try {
             //echo "stepA ";
             $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-            //echo "stepB ";
+
             if (is_array($transcationList)) {
                 //echo "stepC ";
                 foreach ($transcationList as $transaction) {
                     try {
+/*
+                        var_dump(json_encode($transaction));
+                        echo "<br><br><br><br>";
+*/
                         $myTransaction = Transaction::createInstance();
 
                         $myTransaction->merchant_ID = $transaction->advertiserId;
@@ -182,6 +186,14 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                                 $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
                             else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null && $transaction->clickRefs->clickRef2 != 0)
                                 $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
+                            else if (property_exists($transaction->clickRefs,'clickRef3') && $transaction->clickRefs->clickRef3 != null && $transaction->clickRefs->clickRef3 != 0)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef3;
+                            else if (property_exists($transaction->clickRefs,'clickRef4') && $transaction->clickRefs->clickRef4 != null && $transaction->clickRefs->clickRef4 != 0)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef4;
+                            else if (property_exists($transaction->clickRefs,'clickRef5') && $transaction->clickRefs->clickRef5 != null && $transaction->clickRefs->clickRef5 != 0)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef5;
+                            else if (property_exists($transaction->clickRefs,'clickRef6') && $transaction->clickRefs->clickRef6 != null && $transaction->clickRefs->clickRef6 != 0)
+                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef6;
                         }
 
                         $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
