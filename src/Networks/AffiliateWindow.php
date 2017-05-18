@@ -178,9 +178,9 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                         }
                         $myTransaction->unique_ID = $transaction->id;
                         if (is_object($transaction->clickRefs)) {
-                            if (property_exists($transaction->clickRefs,'clickRef') && $transaction->clickRefs->clickRef != null)
+                            if (property_exists($transaction->clickRefs,'clickRef') && $transaction->clickRefs->clickRef != null && $transaction->clickRefs->clickRef != 0)
                                 $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
-                            else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null)
+                            else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null && $transaction->clickRefs->clickRef2 != 0)
                                 $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
                         }
 
