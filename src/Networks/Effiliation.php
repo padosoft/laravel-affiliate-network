@@ -71,13 +71,13 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     {
         $arrResult = array();
         $url = 'http://api.effiliation.com/apiv2/programs.xml?key=' . $this->_password . "&filter=all";
-        echo "effiliation url ",PHP_EOL;
+        echo "effiliation getMerchant url ",PHP_EOL;
         //var_dump($url);
         $content = @\file_get_contents($url);
-        echo "effiliation content",PHP_EOL;
+        // echo "effiliation content",PHP_EOL;
         //var_dump($content);
         $xml = \simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
-        echo "effiliation XML ",PHP_EOL;
+        // echo "effiliation XML ",PHP_EOL;
         //var_dump($xml);
         foreach ($xml->program as $merchant) {
             $Merchant = Merchant::createInstance();
@@ -140,9 +140,9 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
                     $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
                 }
             }
-            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+             $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
 
-            foreach($transcationList as $transaction) {
+            foreach($transactionList as $transaction) {
                 $myTransaction = Transaction::createInstance();
                 try {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
