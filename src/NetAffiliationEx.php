@@ -10,6 +10,8 @@ use Oara\Network\Publisher\NetAffiliation as NetAffiliationOara;
 class NetAffiliationEx extends NetAffiliationOara
 {
     protected $_serverNumber = 6;
+    protected $_merchantIdList = array();     // To avoid repeated calls to \Oara\Utilities::getMerchantIdMapFromMerchantList
+
     /**
      * Call protected/private method of a class.
      *
@@ -97,7 +99,9 @@ class NetAffiliationEx extends NetAffiliationOara
     {
         try {
             $totalTransactions = array();
-            $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+            if (count($this->_merchantIdList) == 0) {
+                $this->_merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+            }
 
             $valuesFormExport = array();
             $valuesFormExport[] = new \Oara\Curl\Parameter('authl', $this->_credentials["user"]);
@@ -118,35 +122,37 @@ class NetAffiliationEx extends NetAffiliationOara
             for ($i = 1; $i < $num; $i++) {
                 $transactionExportArray = str_getcsv($exportData[$i], ";");
                 if (\count($this->_sitesAllowed) == 0 || \in_array($transactionExportArray[7], $this->_sitesAllowed)) {
-                    if (count($merchantIdList)<1 || isset($merchantIdList[$transactionExportArray[0]])) {
-                        $transaction = Array();
-                        $transaction['merchantId'] = $transactionExportArray[0];
-                        //$transactionDate = \DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[1]);
-                        $transaction['date'] = $transactionExportArray[1];
-                        $transaction['title'] = '';
-
-                        if ($transactionExportArray[3] != null) {
-                            $transaction['custom_id'] = $transactionExportArray[3];
-                        }
-
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                        if (\strstr($transactionExportArray[2], 'v')) {
-                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                        } else
-                            if (\strstr($transactionExportArray[2], 'r')) {
-                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            } else if (\strstr($transactionExportArray[2], 'a')) {
-                                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                            } else {
-                                throw new \Exception ("Status not found");
-                            }
-                        $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[4]);
-                        $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
-
-                        $transaction['currency'] = $transactionExportArray[6];
-                        $transaction['unique_id'] = $transactionExportArray[8];
-                        $totalTransactions[] = $transaction;
+                    if (count($this->_merchantIdList) < 1 || isset($this->_merchantIdList[$transactionExportArray[0]])) {
+                        // Ignore missing merchants ID
+                        // echo "NetAffiliationEx - getTransactionList - Merchant Id " . $transactionExportArray[0] . " not found " . PHP_EOL;
                     }
+                    $transaction = Array();
+                    $transaction['merchantId'] = $transactionExportArray[0];
+                    //$transactionDate = \DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[1]);
+                    $transaction['date'] = $transactionExportArray[1];
+                    $transaction['title'] = '';
+
+                    if ($transactionExportArray[3] != null) {
+                        $transaction['custom_id'] = $transactionExportArray[3];
+                    }
+
+                    $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                    if (\strstr($transactionExportArray[2], 'v')) {
+                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                    } else
+                        if (\strstr($transactionExportArray[2], 'r')) {
+                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                        } else if (\strstr($transactionExportArray[2], 'a')) {
+                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                        } else {
+                            throw new \Exception ("Status not found");
+                        }
+                    $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[4]);
+                    $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
+
+                    $transaction['currency'] = $transactionExportArray[6];
+                    $transaction['unique_id'] = $transactionExportArray[8];
+                    $totalTransactions[] = $transaction;
                 }
             }
         } catch (\Exception $e) {
@@ -157,6 +163,4 @@ class NetAffiliationEx extends NetAffiliationOara
         }
         return $totalTransactions;
     }
-
-
 }

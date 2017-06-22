@@ -30,6 +30,7 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
     private $_idSite = '';
     private $_logged    = false;
     protected $_tracking_parameter    = 'argsite';
+    protected $_merchants = array();    // To avoid repeated calls to getMerchants()
 
     /**
      * @method __construct
@@ -160,8 +161,10 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
             }
             $arrResult = array();
             if (count( $arrMerchantID ) < 1) {
-                $merchants = $this->getMerchants();
-                foreach ($merchants as $merchant) {
+                if (count($this->_merchants) == 0) {
+                    $this->_merchants = $this->getMerchants();
+                }
+                foreach ($this->_merchants as $merchant) {
                     $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
                 }
             }

@@ -37,7 +37,10 @@ class EffiliationEx extends EffiliationOara{
 
             for ($i = 1; $i < $num; $i++) {
                 $transactionExportArray = \str_getcsv($exportData[$i], "|");
-                if (isset($merchantIdList[(int)$transactionExportArray[2]])) {
+                // We don't need to check whether the merchant id is valid or not ...
+                // ... for old transactions may be expired and not included in current merchant list
+                // <PN> 2017-06-22
+                // if (isset($merchantIdList[(int)$transactionExportArray[2]])) {
 
                     $transaction = Array();
                     $merchantId = (int)$transactionExportArray[2];
@@ -50,19 +53,27 @@ class EffiliationEx extends EffiliationOara{
                         $transaction['custom_id'] = $transactionExportArray[4];
                     }
 
-                    if ($transactionExportArray[9] == 'Valide') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else
-                        if ($transactionExportArray[9] == 'Attente') {
+                    switch ($transactionExportArray[9]) {
+                        case 'Valide':
+                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                            break;
+                        case 'Attente':
                             $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                        } else
-                            if ($transactionExportArray[9] == 'Refusé') {
-                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            }
+                            break;
+                        case 'Refusé':
+                        case 'Refuse':
+                            // Handle both variations - <PN> - 2017-06-21
+                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                            break;
+                        default:
+                            // Invalid status
+                            echo PHP_EOL."EffiliationEx - Invalid transaction status: " . $transactionExportArray[9] . " (transaction id = " . $transactionExportArray[0] . ")";
+                            break;
+                    }
                     $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
                     $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
                     $totalTransactions[] = $transaction;
-                }
+                // }
             }
         } catch (\Exception $e) {
             // Avoid lost of transactions if one date failed - <PN> - 2017-06-20
