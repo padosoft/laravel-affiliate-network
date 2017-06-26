@@ -1,7 +1,7 @@
 <?php
 namespace Padosoft\AffiliateNetwork;
 
-use Oara\Network\Publisher\Affilinet as AffilinetOara;
+use Oara\Network\Publisher\AffiliNet as AffilinetOara;
 
 class AffilinetEx extends AffilinetOara
 {
