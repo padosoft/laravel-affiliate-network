@@ -49,6 +49,21 @@ class Transaction
     public $date = '';
 
     /**
+     * @var string
+     */
+    public $click_date = '';        // Future use - <PN>
+
+    /**
+     * @var string
+     */
+    public $update_date = '';       // Future use - <PN>
+
+    /**
+     * @var string
+     */
+    public $paid_date = '';       // Future use - <PN>
+
+    /**
      * @var int
      */
     public $merchant_ID = 0;

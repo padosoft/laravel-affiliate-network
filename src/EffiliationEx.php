@@ -80,7 +80,7 @@ class EffiliationEx extends EffiliationOara{
             echo PHP_EOL."EffiliationEx - getTransactionList err: ".$e->getMessage().PHP_EOL;
             throw new \Exception($e);
         }
-        echo (New \DateTime())->format("d/m/Y H:i:s") . " - EffiliationEx getTransactionList - return " . count($totalTransactions) . " transactions",PHP_EOL;
+        echo (New \DateTime())->format("d/m/Y H:i:s") . " - EffiliationEx getTransactionList - return " . count($totalTransactions) . " transactions" . PHP_EOL;
         return $totalTransactions;
     }
 }
