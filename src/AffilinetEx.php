@@ -19,52 +19,57 @@ class AffilinetEx extends AffilinetOara
         // Don't need merchant list here
         // $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
+        $step = 0;
+
         try {
             $publisherStatisticsServiceUrl = 'https://api.affili.net/V2.0/PublisherStatistics.svc?wsdl';
             $publisherStatisticsService = new \SoapClient($publisherStatisticsServiceUrl, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE, 'soap_version' => SOAP_1_1));
 
-            $params = array(
-                'StartDate' => \strtotime($dStartDate->format("Y-m-d")),
-                'EndDate' => \strtotime($dEndDate->format("Y-m-d")),
-                'TransactionStatus' => 'All',
-                'ValuationType' => 'DateOfConfirmation'     // Only modified transactions within date range - <PN> - 2017-06-26
-            );
-            $currentPage = 1;
-            $transactionList = self::affilinetCall('transaction', $publisherStatisticsService, $params, 0, $currentPage);
-
-            while (isset($transactionList->TotalRecords) && $transactionList->TotalRecords > 0 && isset($transactionList->TransactionCollection->Transaction)) {
-                $transactionCollection = array();
-                if (!\is_array($transactionList->TransactionCollection->Transaction)) {
-                    $transactionCollection[] = $transactionList->TransactionCollection->Transaction;
-                } else {
-                    $transactionCollection = $transactionList->TransactionCollection->Transaction;
-                }
-
-                foreach ($transactionCollection as $transactionObject) {
-
-                    $transaction = array();
-                    $transaction["status"] = $transactionObject->TransactionStatus;
-                    $transaction["unique_id"] = $transactionObject->TransactionId;
-                    $transaction["commission"] = $transactionObject->PublisherCommission;
-                    $transaction["amount"] = $transactionObject->NetPrice;
-                    $transaction["date"] = $transactionObject->RegistrationDate;
-                    $transaction["click_date"] = $transactionObject->ClickDate;         // Future use - <PN>
-                    $transaction["udpate_date"] = $transactionObject->CheckDate;        // Future use - <PN>
-                    $transaction["merchantId"] = $transactionObject->ProgramId;
-                    $transaction["custom_id"] = $transactionObject->SubId;
-                    if ($transaction['status'] == 'Confirmed') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else
-                        if ($transaction['status'] == 'Open') {
-                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                        } else
-                            if ($transaction['status'] == 'Cancelled') {
-                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            }
-                    $totalTransactions[] = $transaction;
-                }
-                $currentPage++;
+            // Handle two steps: 1^ to get registered transactions / 2^ to get confirmed or cancelled transactions - <PN> 2017-06-27
+            while ($step++ <= 2) {
+                $params = array(
+                    'StartDate' => \strtotime($dStartDate->format("Y-m-d")),
+                    'EndDate' => \strtotime($dEndDate->format("Y-m-d")),
+                    'TransactionStatus' => 'All',
+                    'ValuationType' => $step == 1 ? 'DateOfRegistration' : 'DateOfConfirmation'
+                );
+                $currentPage = 1;
                 $transactionList = self::affilinetCall('transaction', $publisherStatisticsService, $params, 0, $currentPage);
+
+                while (isset($transactionList->TotalRecords) && $transactionList->TotalRecords > 0 && isset($transactionList->TransactionCollection->Transaction)) {
+                    $transactionCollection = array();
+                    if (!\is_array($transactionList->TransactionCollection->Transaction)) {
+                        $transactionCollection[] = $transactionList->TransactionCollection->Transaction;
+                    } else {
+                        $transactionCollection = $transactionList->TransactionCollection->Transaction;
+                    }
+
+                    foreach ($transactionCollection as $transactionObject) {
+
+                        $transaction = array();
+                        $transaction["status"] = $transactionObject->TransactionStatus;
+                        $transaction["unique_id"] = $transactionObject->TransactionId;
+                        $transaction["commission"] = $transactionObject->PublisherCommission;
+                        $transaction["amount"] = $transactionObject->NetPrice;
+                        $transaction["date"] = $transactionObject->RegistrationDate;
+                        $transaction["click_date"] = $transactionObject->ClickDate;         // Future use - <PN>
+                        $transaction["udpate_date"] = $transactionObject->CheckDate;        // Future use - <PN>
+                        $transaction["merchantId"] = $transactionObject->ProgramId;
+                        $transaction["custom_id"] = $transactionObject->SubId;
+                        if ($transaction['status'] == 'Confirmed') {
+                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        } else
+                            if ($transaction['status'] == 'Open') {
+                                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                            } else
+                                if ($transaction['status'] == 'Cancelled') {
+                                    $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                                }
+                        $totalTransactions[] = $transaction;
+                    }
+                    $currentPage++;
+                    $transactionList = self::affilinetCall('transaction', $publisherStatisticsService, $params, 0, $currentPage);
+                }
             }
         } catch (\Exception $e) {
             // Avoid lost of transactions if one call failed
