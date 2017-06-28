@@ -170,9 +170,9 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                     $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
                 }
             }
-            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateTo, $dateFrom);
+            $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
             //$i=0;
-            foreach($transcationList as $transaction) {
+            foreach($transactionList as $transaction) {
                 try {
                     /*
                     $i++;
@@ -190,6 +190,10 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                     if (!empty($transaction['date'])) {
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date;
+                    }
+                    if (!empty($transaction['validation_date'])) {
+                        $date = new \DateTime($transaction['validation_date']);
+                        $myTransaction->update_date = $date;
                     }
                     $myTransaction->merchant_ID = $transaction['merchantId'];
                     $myTransaction->approved = $transaction['approved'];
