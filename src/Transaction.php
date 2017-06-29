@@ -104,6 +104,11 @@ class Transaction
     public $referrer = '';
 
     /**
+     * @var string
+     */
+    public $IP = '';       // Future use - <PN>
+
+    /**
      * @method createInstance
      * @return obj istance
      */
