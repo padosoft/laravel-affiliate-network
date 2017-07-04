@@ -160,13 +160,14 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-        foreach($transcationList as $transaction) {
+        $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+        foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->merchant_ID = $transaction['merchantId'];
             $date = new \DateTime($transaction['date']);
             $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
             $Transaction->unique_ID = $transaction['unique_id'];
+            $Transaction->transaction_ID = $transaction['unique_id'] . '-' . $transaction['event_id'];
             array_key_exists_safe( $transaction,
                 'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
             $Transaction->status = $transaction['status'];

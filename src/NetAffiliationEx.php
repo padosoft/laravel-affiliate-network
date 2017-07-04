@@ -106,7 +106,7 @@ class NetAffiliationEx extends NetAffiliationOara
             $valuesFormExport = array();
             $valuesFormExport[] = new \Oara\Curl\Parameter('authl', $this->_credentials["user"]);
             $valuesFormExport[] = new \Oara\Curl\Parameter('authv', $this->_credentials["apiPassword"]);
-            $valuesFormExport[] = new \Oara\Curl\Parameter('champs', 'idprogramme,date,etat,argsite,montant,gains,monnaie,idsite,id');
+            $valuesFormExport[] = new \Oara\Curl\Parameter('champs', 'idcampagne,date,etat,argsite,montant,gains,monnaie,idsite,id');
             $valuesFormExport[] = new \Oara\Curl\Parameter('debut', $dStartDate->format("Y-m-d"));
             $valuesFormExport[] = new \Oara\Curl\Parameter('fin', $dEndDate->format("Y-m-d"));
             $urls = array();
@@ -151,7 +151,8 @@ class NetAffiliationEx extends NetAffiliationOara
                     $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
 
                     $transaction['currency'] = $transactionExportArray[6];
-                    $transaction['unique_id'] = $transactionExportArray[8];
+                    // Create the unique_id by combining id+id_campagne - <PN> - 2017-07-03
+                    $transaction['unique_id'] = $transactionExportArray[8] . '-' . $transactionExportArray[0];
                     $totalTransactions[] = $transaction;
                 }
             }
