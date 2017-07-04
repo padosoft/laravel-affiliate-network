@@ -151,8 +151,10 @@ class NetAffiliationEx extends NetAffiliationOara
                     $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[5]);
 
                     $transaction['currency'] = $transactionExportArray[6];
-                    // Create the unique_id by combining id+id_campagne - <PN> - 2017-07-03
-                    $transaction['unique_id'] = $transactionExportArray[8] . '-' . $transactionExportArray[0];
+                    $transaction['unique_id'] = $transactionExportArray[8];
+                    // Create the unique transaction id by combining id+id_campagne - <PN> - 2017-07-04
+                    $transaction['transaction_id'] = $transactionExportArray[8] . '-' . $transactionExportArray[0];
+
                     $totalTransactions[] = $transaction;
                 }
             }

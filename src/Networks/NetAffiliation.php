@@ -186,6 +186,8 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
                     array_key_exists_safe( $transaction,
                         'unique_id' ) ? $Transaction->unique_ID = $transaction['unique_id'] : $Transaction->unique_ID = '';
                     array_key_exists_safe( $transaction,
+                        'transaction_id' ) ? $Transaction->transaction_ID = $transaction['transaction_id'] : $Transaction->transaction_ID = '';
+                    array_key_exists_safe( $transaction,
                         'commission' ) ? $Transaction->commission = $transaction['commission'] : $Transaction->commission = 0;
                     $date = new \DateTime( $transaction['date'] );
                     $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
