@@ -157,6 +157,9 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             if ($Transaction->status==\Oara\Utilities::STATUS_CONFIRMED){
                 $Transaction->approved = true;
             }
+            if ($transaction['paid'] == true) {
+                $Transaction->paid = true;
+            }
             $arrResult[] = $Transaction;
         }
 

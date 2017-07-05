@@ -59,11 +59,6 @@ class Transaction
     public $update_date = '';       // Future use - <PN>
 
     /**
-     * @var string
-     */
-    public $paid_date = '';       // Future use - <PN>
-
-    /**
      * @var int
      */
     public $merchant_ID = 0;
@@ -72,6 +67,16 @@ class Transaction
      * @var boolean
      */
     public $approved = false;
+
+    /**
+     * @var boolean
+     */
+    public $paid = false;       // Future use - <PN>
+
+    /**
+     * @var string
+     */
+    public $paid_date = '';       // Future use - <PN>
 
     /**
      * @var array
