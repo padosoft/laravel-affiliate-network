@@ -20,7 +20,8 @@ class EffiliationEx extends EffiliationOara{
 
             $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
-            $url = 'http://api.effiliation.com/apiv2/transaction.csv?key=' . $this->_credentials["apiPassword"] . '&start=' . $dStartDate->format("d/m/Y") . '&end=' . $dEndDate->format("d/m/Y") . '&type=date&all=yes';
+            // Retrieve by date transaction instead of date click (type=datetran)- <PN> 2017-07-05
+            $url = 'http://api.effiliation.com/apiv2/transaction.csv?key=' . $this->_credentials["apiPassword"] . '&start=' . $dStartDate->format("d/m/Y") . '&end=' . $dEndDate->format("d/m/Y") . '&type=datetran&all=yes';
             // Set timeout to 300 secs. due to api delays - <PN> 2017-06-20
             $ctx = stream_context_create(array(
                     'http' => array(
