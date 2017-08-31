@@ -10,6 +10,7 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\ProductsResultset;
+use Padosoft\AffiliateNetwork\EbayEx;
 
 /**
  * Class Ebay
@@ -23,7 +24,7 @@ class Ebay extends AbstractNetwork implements NetworkInterface
     private $_network = null;
     private $_username = '';
     private $_password = '';
-    private $_apiClient = null;
+    protected $_apiClient = null;
     protected $_tracking_parameter    = 'clickref';
 
     /**
@@ -31,9 +32,13 @@ class Ebay extends AbstractNetwork implements NetworkInterface
      */
     public function __construct(string $username, string $password, string $idSite='')
     {
-        $this->_network = new \Oara\Network\Publisher\Ebay;
+        $this->_network = new  EbayEx;
         $this->_username = $username;
         $this->_password = $password;
+        if (trim($idSite)!=''){
+            // Ebay needs Site to filter countries
+            $this->addAllowedSite($idSite);
+        }
         /*
         $apiUrl = 'http://ws.webgains.com/aws.php';
         $this->_apiClient = new \SoapClient($apiUrl,
@@ -47,6 +52,12 @@ class Ebay extends AbstractNetwork implements NetworkInterface
         $this->login( $this->_username, $this->_password );
     }
 
+    public function addAllowedSite($idSite){
+        if (trim($idSite)!=''){
+            $this->_network->addAllowedSite($idSite);
+        }
+    }
+
     public function login(string $username, string $password,string $idSite=''): bool{
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
@@ -55,6 +66,10 @@ class Ebay extends AbstractNetwork implements NetworkInterface
         }
         $this->_username = $username;
         $this->_password = $password;
+        if (trim($idSite)!=''){
+            // Ebay needs Site to filter countries
+            $this->addAllowedSite($idSite);
+        }
         $credentials = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
@@ -128,7 +143,7 @@ class Ebay extends AbstractNetwork implements NetworkInterface
             }
             $Transaction->merchant_ID = $transaction['merchantId'];
             $Transaction->campaign_name =  $transaction['merchantName'];
-            $Transaction->IP =  $transaction['IP'];
+            // $Transaction->IP =  $transaction['IP'];
             $Transaction->approved = false;
             if ($Transaction->status==\Oara\Utilities::STATUS_CONFIRMED){
                 $Transaction->approved = true;
