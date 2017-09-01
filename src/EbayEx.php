@@ -165,7 +165,8 @@ class EbayEx extends EbayOara
                     $transaction['custom_id'] = $transactionExportArray[10];
                 }
                 $transaction['click_date'] = $transactionExportArray[11];
-                $transaction['amount'] = (float) $transactionExportArray[3];
+                $transaction['ebay_amount'] = (float) $transactionExportArray[3];
+                $transaction['amount'] = (float) $transactionExportArray[15];
                 $transaction['commission'] = (float) $transactionExportArray[20];
                 // Set status as Pending
                 // ... real status (approved / denied) must be calculated by summing all negative/positive records
