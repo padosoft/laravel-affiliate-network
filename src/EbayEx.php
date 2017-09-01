@@ -167,45 +167,12 @@ class EbayEx extends EbayOara
                 $transaction['click_date'] = $transactionExportArray[11];
                 $transaction['amount'] = (float) $transactionExportArray[3];
                 $transaction['commission'] = (float) $transactionExportArray[20];
-
-                if ($transaction['amount'] < 0 && $transaction['commission'] < 0) {
-                    $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                    $transaction['amount'] = abs($transaction['amount']);
-                    $transaction['commission'] = abs($transaction['commission']);
-                }
-                else {
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                }
+                // Set status as Pending
+                // ... real status (approved / denied) must be calculated by summing all negative/positive records
+                // ... and checking final amount for a positive or zero value
+                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
                 $totalTransactions[] = $transaction;
             }
-        }
-
-        // Step 2 - Group transactions by unique_id and sum um values to get the real amount/commission values
-        $consolidate = Array();
-        $num = \count($totalTransactions);
-        for ($i = 1; $i < $num; $i++) {
-            $unique_id = $totalTransactions[$i]['unique_id'];
-            if (array_key_exists($unique_id, $consolidate)) {
-                $consolidate[$unique_id]['amount'] += $totalTransactions[$i]['amount'];
-                $consolidate[$unique_id]['commission'] += $totalTransactions[$i]['commission'];
-                if ($totalTransactions[$i]['post_date'] > $consolidate[$unique_id]['post_date']) {
-                    $consolidate[$unique_id]['post_date'] = $totalTransactions[$i]['post_date'];
-                }
-            }
-            else {
-                $consolidate[$unique_id] = $totalTransactions[$i];
-            }
-        }
-        // Step 3 - Get total by unique id
-        $totalTransactions = array();
-        foreach ($consolidate as $unique_id => $transaction) {
-            if ($transaction['amount'] <=0 && $transaction['commission'] <=0) {
-                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-            }
-            else {
-                $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-            }
-            $totalTransactions[] = $transaction;
         }
         return $totalTransactions;
     }

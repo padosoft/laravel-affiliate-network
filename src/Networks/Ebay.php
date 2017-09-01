@@ -138,8 +138,8 @@ class Ebay extends AbstractNetwork implements NetworkInterface
             if (isset($transaction['click_date']) && !empty($transaction['click_date'])) {
                 $Transaction->click_date = new \DateTime($transaction['click_date']);
             }
-            if (isset($transaction['update_date']) && !empty($transaction['update_date'])) {
-                $Transaction->update_date = new \DateTime($transaction['update_date']);
+            if (isset($transaction['post_date']) && !empty($transaction['post_date'])) {
+                $Transaction->update_date = new \DateTime($transaction['post_date']);
             }
             $Transaction->merchant_ID = $transaction['merchantId'];
             $Transaction->campaign_name =  $transaction['merchantName'];
