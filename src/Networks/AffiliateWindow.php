@@ -201,7 +201,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                             $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
                         } else if ($transaction->commissionStatus == 'pending') {
                             $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                        } else if ($transaction->commissionStatus == 'pending') {
+                        } else if ($transaction->commissionStatus == 'declined') {
                             $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
                         }
                         //echo $transaction->saleAmount->amount."<br>";
