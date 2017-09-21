@@ -110,27 +110,55 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
             return $result;
         }
         $arrResult = array();
-        $jsonVouchers = file_get_contents("https://api.tradedoubler.com/1.0/vouchers.json;voucherTypeId=1?token=".$_ENV['TRADEDOUBLER_TOKEN']);
+        $jsonVouchers = file_get_contents("https://api.tradedoubler.com/1.0/vouchers.json;dateOutputFormat=iso8601?token=".$_ENV['TRADEDOUBLER_TOKEN']);
         $arrVouchers = json_decode($jsonVouchers, true);
 
-        foreach($arrVouchers as $vouchers) {
+        foreach($arrVouchers as $voucher) {
             $Deal = Deal::createInstance();
-            $Deal->deal_ID = $vouchers['id'];
-            $Deal->merchant_ID = $vouchers['programId'];
-            $Deal->merchant_name = $vouchers['programName'];
-            $Deal->code = $vouchers['code'];
-            $Deal->name = $vouchers['title'];
-            $Deal->short_description = $vouchers['shortDescription'];
-            $Deal->description = $vouchers['description'];
-            $Deal->deal_type = $vouchers['voucherTypeId'];
-            $Deal->default_track_uri = $vouchers['defaultTrackUri'];
-            $Deal->default_track_uri = $vouchers['landingUrl'];
-            $Deal->discount_amount = $vouchers['discountAmount'];
-            $Deal->is_percentage = $vouchers['isPercentage'];
-            $Deal->currency_initial = $vouchers['currencyId'];
-            $Deal->logo_path = $vouchers['logoPath'];
+            $Deal->setValues($voucher, [
+                'id' => 'deal_ID' ,
+                'programId' => 'merchant_ID' ,
+                'code' => 'code' ,
+                'updateDate' => 'update_date' ,
+                'publishStartDate' => 'publish_start_date' ,
+                'publishEndDate' => 'publish_end_date' ,
+                'startDate' => 'start_date' ,
+                'endDate' => 'end_date' ,
+                'title' => 'name' ,
+                'shortDescription' => 'short_description' ,
+                'description' => 'description' ,
+                'voucherTypeId' => 'deal_type' ,
+                'defaultTrackUri' => 'default_track_uri' ,
+                'landingUrl' => 'landing_url' ,
+                'discountAmount' => 'discount_amount' ,
+                'isPercentage' => 'is_percentage' ,
+                'publisherInformation' => 'information' ,
+                'languageId' => 'language' ,
+                'exclusive' => 'is_exclusive' ,
+                'siteSpecific' => 'is_site_specific' ,
+                'currencyId' => 'currency_initial' ,
+                'logoPath' => 'logo_path' ,
+            ]);
+            switch ($voucher['voucherTypeId']) {
+                case 1:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    break;
+                case 2:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+                case 3:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_ARTICLE;
+                    break;
+                case 4:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_SHIPPING;
+                    break;
+                case 5:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_LOTTERY;
+                    break;
+            }
+
             if($merchantID > 0) {
-                if($vouchers['programId'] == $merchantID) {
+                if($voucher['programId'] == $merchantID) {
                     $arrResult[] = $Deal;
                 }
             }

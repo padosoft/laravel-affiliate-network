@@ -159,8 +159,8 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         }*/
 
         try {
-            //echo "stepA ";
-            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+            // Added timezone parameter
+            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo, 'UTC');
 
             if (is_array($transcationList)) {
                 //echo "stepC ";
@@ -176,7 +176,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                         $myTransaction->date = $transaction->transactionDate;
                         //echo $transaction->transactionDate."<br>";
                         if (!empty($transaction->transactionDate)) {
-                            $date = new \DateTime($transaction->transactionDate);
+                            $date = new \DateTime($transaction->transactionDate, new \DateTimeZone('UTC'));
                             $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
                             //var_dump($date);
                         }

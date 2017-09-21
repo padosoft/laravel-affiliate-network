@@ -11,42 +11,57 @@ class Deal
     /**
      * @var int
      */
-    public $merchant_ID=0;
+    public $merchant_ID = 0;
 
     /**
      * @var string
      */
-    public $merchant_name='';
+    public $merchant_name = '';
 
     /**
      * @var int
      */
-    public $network_ID=0;
+    public $network_ID = 0;
 
     /**
      * @var int
      */
-    public $type=0;
+    public $type = 0;
 
     /**
      * @var string
      */
-    public $code='';
+    public $code = '';
 
     /**
      * @var string
      */
-    public $url='';
+    public $url = '';
 
     /**
      * @var \DateTime
      */
-    public $startDate;
+    public $start_date;
 
     /**
      * @var \DateTime
      */
-    public $endDate;
+    public $end_date;
+
+    /**
+     * @var \DateTime
+     */
+    public $update_date;
+
+    /**
+     * @var \DateTime
+     */
+    public $publish_start_date;
+
+    /**
+     * @var \DateTime
+     */
+    public $publish_end_date;
 
     /**
      * @var integer
@@ -61,6 +76,11 @@ class Deal
     /**
      * @var string
      */
+    public $language = '';
+
+    /**
+     * @var string
+     */
     public $logo_path = '';
 
     /**
@@ -71,12 +91,17 @@ class Deal
     /**
      * @var string
      */
-    public $short_description='';
+    public $short_description = '';
 
     /**
      * @var string
      */
-    public $description='';
+    public $description = '';
+
+    /**
+     * @var string
+     */
+    public $information = '';
 
     /**
      * @var string
@@ -96,12 +121,22 @@ class Deal
     /**
      * @var boolean
      */
-    public $is_percentage=false;
+    public $is_percentage = false;
+
+    /**
+     * @var boolean
+     */
+    public $is_exclusive = false;
+
+    /**
+     * @var boolean
+     */
+    public $is_site_specific = false;
 
     /**
      * @var string
      */
-    public $landing_url='';
+    public $landing_url = '';
 
     /**
      * @var string
@@ -112,6 +147,10 @@ class Deal
      * @var string
      */
     public $ppc = '';
+
+    public function __construct() {
+        $this->publish_end_date = $this->publish_start_date = $this->update_date = $this->end_date = $this->start_date = \DateTime::createFromFormat('Y-m-d','2000-01-01 00:00:00');
+    }
 
     /**
      * @method createInstance
@@ -128,5 +167,32 @@ class Deal
         return $obj;
     }
 
-
+    /**
+     * Move data from array to class by associative array source => destination
+     * (skip invalid or empty fields)
+     * @param array $source
+     * @param array $association
+     */
+    public function setValues(array $source, array $association) {
+        foreach ($association as $src => $dest) {
+            if (array_key_exists($src, $source) && isset($this->$dest)) {
+                if (strpos($dest, 'date') !== false) {
+                    // Try to convert any date
+                    $date = \DateTime::createFromFormat(\DateTime::ISO8601, $source[$src]);
+                    if ($date === false) {
+                        $date = \DateTime::createFromFormat("Y-m-d\TH:i:s.uO", $source[$src]);
+                    }
+                    if ($date !== false) {
+                        $this->$dest = $date;
+                    }
+                }
+                else {
+                    $this->$dest = $source[$src];
+                }
+            }
+            else {
+                // Missing field .. ignore
+            }
+        }
+    }
 }
