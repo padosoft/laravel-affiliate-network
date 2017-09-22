@@ -80,8 +80,8 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
-            $Merchant->merchant_ID = $merchant['cid'];
-            $Merchant->name = $merchant['name'];
+            $Merchant->merchant_ID = $merchant->id;
+            $Merchant->name = $merchant->name;
             $arrResult[] = $Merchant;
         }
 
@@ -97,43 +97,64 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID,int $page=0,int $items_per_page=10) : DealsResultset
     {
-        if (!isIntegerPositive($items_per_page)){
-            $items_per_page=10;
-        }
-        $result=DealsResultset::createInstance();
-        if (!$this->checkLogin()) {
-            return $result;
-        }
-        $arrResult = array();
-        $jsonVouchers = file_get_contents("https://api.tradedoubler.com/1.0/vouchers.json;voucherTypeId=1?token=".$_ENV['TRADEDOUBLER_TOKEN']);
-        $arrVouchers = json_decode($jsonVouchers, true);
+        $result = DealsResultset::createInstance();
 
-        foreach($arrVouchers as $vouchers) {
-            $Deal = Deal::createInstance();
-            $Deal->deal_ID = $vouchers['id'];
-            $Deal->merchant_ID = $vouchers['programId'];
-            $Deal->merchant_name = $vouchers['programName'];
-            $Deal->code = $vouchers['code'];
-            $Deal->name = $vouchers['title'];
-            $Deal->short_description = $vouchers['shortDescription'];
-            $Deal->description = $vouchers['description'];
-            $Deal->deal_type = $vouchers['voucherTypeId'];
-            $Deal->default_track_uri = $vouchers['defaultTrackUri'];
-            $Deal->default_track_uri = $vouchers['landingUrl'];
-            $Deal->discount_amount = $vouchers['discountAmount'];
-            $Deal->is_percentage = $vouchers['isPercentage'];
-            $Deal->currency_initial = $vouchers['currencyId'];
-            $Deal->logo_path = $vouchers['logoPath'];
-            if($merchantID > 0) {
-                if($vouchers['programId'] == $merchantID) {
-                    $arrResult[] = $Deal;
+        if (!isset($_ENV['AWIN_API_VOUCHER_KEY'])) {
+            throw new \Exception("Awin api key not defined");
+        }
+        $apiKey = $_ENV['AWIN_API_VOUCHER_KEY'];
+
+        $arrResult = array();
+        $arrVouchers = $this->_network->getVouchers($apiKey);
+
+        foreach($arrVouchers as $obj_voucher) {
+
+            $voucher = str_getcsv($obj_voucher, ',', '"');
+
+            if (count($voucher) < 17) {
+                continue;
+            }
+            $promotionId = $voucher[0];
+            if (!is_numeric($promotionId)) {
+                continue;
+            }
+            $advertiser = $voucher[1];
+            $advertiserId = $voucher[2];
+            $type = $voucher[3];
+            $code = $voucher[4];
+            $description = $voucher[5];
+            $starts = $voucher[6];
+            $ends = $voucher[7];
+            $categories = $voucher[8];
+            $regions = $voucher[9];
+            $terms = $voucher[10];
+            $deeplink_tracking = $voucher[11];
+            $deeplink = $voucher[12];
+            $commission_group = $voucher[13];
+            $commission = $voucher[14];
+            $exclusive = $voucher[15];
+            $date_added = $voucher[16];
+
+            if ($merchantID > 0) {
+                if ($advertiserId != $merchantID) {
+                    continue;
                 }
             }
-            else {
-                $arrResult[] = $Deal;
-            }
+
+            $Deal = Deal::createInstance();
+            $Deal->deal_ID = $promotionId;
+            $Deal->merchant_ID = $advertiserId;
+            $Deal->code = $code;
+            $Deal->description = $description;
+            $Deal->start_date = $Deal->convertDate($starts);
+            $Deal->end_date = $Deal->convertDate($ends);
+            $Deal->default_track_uri = $deeplink_tracking;
+            $Deal->is_exclusive = $exclusive;
+            $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+            $arrResult[] = $Deal;
         }
         $result->deals[]=$arrResult;
+
         return $result;
     }
 

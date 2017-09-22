@@ -91,7 +91,7 @@ class NetworkManager
      *
      * @return \Padosoft\AffiliateNetwork\DealsResultset
      */
-    public function getDeals($network_alias, int $merchantID = 0,int $page=0,int $items_per_page=10 ): DealsResultset
+    public function getDeals($network_alias, int $merchantID = 0, int $page = 0, int $items_per_page = 0 ): DealsResultset
     {
         if (!$this->hasNetwork($network_alias)) {
             return DealsResultset::createInstance();
@@ -99,7 +99,7 @@ class NetworkManager
         if (!isIntegerPositive($merchantID)){
             $merchantID=NULL;
         }
-        return $this->networks[$network_alias]->getDeals( $merchantID,$page,$items_per_page );
+        return $this->networks[$network_alias]->getDeals( $merchantID, $page, $items_per_page );
     }
 
     /**

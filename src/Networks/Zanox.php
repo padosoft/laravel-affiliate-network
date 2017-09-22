@@ -101,17 +101,17 @@ class Zanox extends AbstractNetwork implements NetworkInterface
      *
      * @return DealsResultset
      */
-    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
+    public function getDeals($merchantID=NULL,int $page = 0, int $items_per_page = 0 ): DealsResultset
     {
-        if (!isIntegerPositive($items_per_page)){
-            $items_per_page=10;
-        }
-        $result=DealsResultset::createInstance();
+        $result = DealsResultset::createInstance();
         if (!$this->checkLogin()) {
             return $result;
         }
-        /*$this->_apiClient->setConnectId( $this->_username );
-        $this->_apiClient->setSecretKey( $this->_password );*/
+        /*
+        if (!isIntegerPositive($items_per_page) || $items_per_page <= 0 || $items_per_page > 999) {
+            $items_per_page = 999;
+        }
+        */
         $adSpaces=$this->_apiClient->getAdspaces(0,100);
         if (!is_object($adSpaces)){
             $adSpaces=json_encode($adSpaces);
@@ -125,7 +125,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
             $merchantID=NULL;
         }
 
-        $Response = $this->_apiClient->searchIncentives($merchantID,$adSpaceId,'coupons',NULL,$page,$items_per_page);
+        $Response = $this->_apiClient->searchIncentives($merchantID,$adSpaceId,null,null, $page, $items_per_page);
         
         if (!is_object($Response)){
             $Response=json_decode($Response);
@@ -133,47 +133,64 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         $result->page=$Response->page;
         $result->items=$Response->items;
         $result->total=$Response->total;
-        ($Response->total>0)?$result->num_pages=(int)ceil($Response->total/$items_per_page):$result->num_pages=0;
+        // ($Response->total>0)?$result->num_pages=(int)ceil($Response->total/$items_per_page):$result->num_pages=0;
         $arrAdmediumItems = $Response->incentiveItems->incentiveItem;
 
         foreach ($arrAdmediumItems as $admediumItems) {
             $Deal = Deal::createInstance();
-            $Deal->id = (int)$admediumItems->id;
-            $Deal->created_at =$admediumItems->createDate;
-            $Deal->startDate = $admediumItems->startDate;
-            isset($admediumItems->endDate)?$Deal->endDate = $admediumItems->endDate:$Deal->endDate = '';
+            $Deal->deal_ID = (int)$admediumItems->id;
+            $Deal->start_date = $Deal->convertDate($admediumItems->startDate);
+            isset($admediumItems->endDate) ? $Deal->end_date = $Deal->convertDate($admediumItems->endDate): $Deal->end_date = '2099-12-31';
             $Deal->name = $admediumItems->name;
             $Deal->code = $admediumItems->couponCode;
             $Deal->description = $admediumItems->info4customer;
-            $Deal->note = $admediumItems->info4publisher.' '.$admediumItems->restrictions;
-            $Deal->is_percent = 0;
-            $Deal->value=0;
-            $Deal->currency='';
-            //dd($admediumItems->percentage);
+            $Deal->information = $admediumItems->info4publisher.' '.$admediumItems->restrictions;
+            $Deal->is_percentage = 0;
+            $Deal->discount_amount = 0;
+            $Deal->currency_initial = '';
             if (isset($admediumItems->percentage) && isIntegerPositive($admediumItems->percentage)){
-                $Deal->is_percent = 1;
-                $Deal->value=$admediumItems->percentage;
+                $Deal->is_percentage = 1;
+                $Deal->discount_amount = $admediumItems->percentage;
             }elseif (isset($admediumItems->total)){
-
-                $Deal->value=$admediumItems->total;
-                $Deal->currency=$admediumItems->currency;
+                $Deal->discount_amount = $admediumItems->total;
+                $Deal->currency_initial = $admediumItems->currency;
             }
-            //$Deal->deal_type = $admediumItems['admediumType'];
+            switch ($admediumItems->incentiveType) {
+                case 'coupons':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    break;
+                case 'bargains':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+                case 'noShippingCosts':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_SHIPPING;
+                    break;
+                case 'freeProducts':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_ARTICLE;
+                    break;
+                case 'lotteries':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_LOTTERY;
+                    break;
+                default:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+            }
             $Deal->merchant_ID = (int)$admediumItems->program->id;
             
             $Deal->merchant_name = $admediumItems->program->_;
-            $Deal->ppv = $admediumItems->admedia->admediumItem[0]->trackingLinks->trackingLink[0]->ppv;
-            $Deal->ppc = $admediumItems->admedia->admediumItem[0]->trackingLinks->trackingLink[0]->ppc;
-            $result->deals[]=$Deal;
-            /*if ($merchantID > 0) {
-                if ($merchantID == $admediumItems['program']['@id']) {
-                    $arrResult[] = $Deal;
-                }
-            } else {
-                $arrResult[] = $Deal;
-            }*/
+            if (isset($admediumItems->admedia->admediumItem[0]->trackingLinks->trackingLink)) {
+                $Deal->ppv = $admediumItems->admedia->admediumItem[0]->trackingLinks->trackingLink[0]->ppv;
+                $Deal->ppc = $admediumItems->admedia->admediumItem[0]->trackingLinks->trackingLink[0]->ppc;
+                $Deal->default_track_uri = $Deal->ppc;
+            }
+            else {
+                $Deal->ppv = "*** NO LINK ***";
+                $Deal->ppc = "*** NO LINK ***";
+
+            }
+            $arrResult[] = $Deal;
         }
-        //dd($result);
+        $result->deals[] = $arrResult;
         return $result;
     }
 

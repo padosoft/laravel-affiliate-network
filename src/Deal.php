@@ -182,17 +182,7 @@ class Deal
         foreach ($association as $src => $dest) {
             if (array_key_exists($src, $source) && isset($this->$dest)) {
                 if (strpos($dest, 'date') !== false) {
-                    // Try to convert any possible date format
-                    $date = \DateTime::createFromFormat(\DateTime::ISO8601, $source[$src]);
-                    if ($date === false) {
-                        $date = \DateTime::createFromFormat("Y-m-d\TH:i:s.uO", $source[$src]);
-                    }
-                    if ($date === false) {
-                        $date = \DateTime::createFromFormat("Y-m-d\TH:i:s", substr($source[$src],0,19));
-                    }
-                    if ($date !== false) {
-                        $this->$dest = $date;
-                    }
+                    $this->$dest = $this->convertDate($source[$src]);
                 }
                 else {
                     $this->$dest = $source[$src];
@@ -202,5 +192,23 @@ class Deal
                 // Missing field .. ignore
             }
         }
+    }
+
+    public function convertDate($source) {
+        // Try to convert any possible date format
+        $date = \DateTime::createFromFormat(\DateTime::ISO8601, $source);
+        if ($date === false) {
+            $date = \DateTime::createFromFormat("Y-m-d\TH:i:s.uO", $source);
+        }
+        if ($date === false) {
+            $date = \DateTime::createFromFormat("Y-m-d\TH:i:s", substr($source,0,19));
+        }
+        if ($date === false) {
+            $date = \DateTime::createFromFormat("d/m/Y H:i:s", $source);
+        }
+        if ($date === false) {
+            $date = \DateTime::createFromFormat('Y-m-d','2000-01-01 00:00:00');
+        }
+        return $date;
     }
 }
