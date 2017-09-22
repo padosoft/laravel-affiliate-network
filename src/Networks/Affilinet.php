@@ -99,59 +99,81 @@ class Affilinet extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID = NULL, int $page = 0, int $items_per_page = 10): DealsResultset
     {
-        $arrResult = new DealsResultset();
+        $result = DealsResultset::createInstance();
 
-        // <TODO>
-        /*
-        if ($page<1){
-            $page=1;
-        }
-        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&advertiser-ids='.$merchantID.'&records-per-page='.$items_per_page.'&page-number='.$page);
-        //var_dump($response);
-        if ($response===false || \preg_match("/error/", $response)) {
-            return $arrResult;
-        }
+        $arrResult = array();
+        $arrVouchers = $this->_network->getVouchers();
 
+        foreach($arrVouchers as $obj_voucher) {
 
-        $arrResponse = xml2array($response);
+            $voucher = json_decode(json_encode($obj_voucher), true);
 
-        if (!is_array($arrResponse) || count($arrResponse) <= 0) {
-            return $arrResult;
-        }
-        if (!isset($arrResponse['cj-api']['links'])){
-            return $arrResult;
-        }
-        $arrResult->page=$arrResponse['cj-api']['links_attr']['page-number'];
-        $arrResult->items=$arrResponse['cj-api']['links_attr']['records-returned'];
-        $arrResult->total=$arrResponse['cj-api']['links_attr']['total-matched'];
-        ($arrResult->total>0)?$arrResult->num_pages=(int)ceil($arrResult->total/$items_per_page):$arrResult->num_pages=0;
-        $arrCoupon = $arrResponse['cj-api']['links']['link'];
-
-        foreach ($arrCoupon as $coupon) {
-            //  var_dump($coupon);
-            $Deal = Deal::createInstance();
-            $Deal->id = $coupon['link-id'];
-            $Deal->name = $coupon['link-name'];
-            $Deal->description = $coupon['description'];
-            $Deal->note = $coupon['description'];
-            $Deal->merchant_ID = $coupon['advertiser-id'];
-            $Deal->merchant_name = $coupon['advertiser-name'];
-            $Deal->ppc = $coupon['clickUrl'];
-            $Deal->description = $coupon['description'];
-            if (!empty($coupon['promotion-start-date'])) {
-                $startDate = new \DateTime($coupon['promotion-start-date']);
-                $Deal->startDate = $startDate;
-                $Deal->created_at = $startDate;
+            if ($merchantID > 0) {
+                if ($voucher['ProgramId'] != $merchantID) {
+                    continue;
+                }
             }
-            if (!empty($coupon['promotion-end-date'])) {
-                $endDate = new \DateTime($coupon['promotion-end-date']);
-                $Deal->endDate = $endDate;
+
+            $partnershipStatus = $voucher['PartnershipStatus'];
+            if ($partnershipStatus == 'NoRestriction' || $partnershipStatus == 'Accepted') {
+                // Get only approved or without restriction
+                $Deal = Deal::createInstance();
+                $Deal->setValues($voucher, [
+                    'Id' => 'deal_ID',
+                    'ProgramId' => 'merchant_ID',
+                    'Code' => 'code',
+                    'LastChengeDate' => 'update_date',
+                    'StartDate' => 'start_date',
+                    'EndDate' => 'end_date',
+                    'Title' => 'name',
+                    'Description' => 'description',
+                    'IsExclusive' => 'is_exclusive',
+                    'MinimumOrderValue' => 'minimum_order_value',
+                ]);
+                /*
+                // Check voucher type (NOT USED HERE)
+                $voucherType = $voucher['VoucherTypes']['VoucherType'];
+                if (is_array($voucherType)) {
+                    foreach ($voucherType as $type) {
+                        switch ($type) {
+                            case 'AllProducts':
+                                break;
+                            case 'SpecificProducts':
+                                break;
+                            case 'MultiBuyDiscount':
+                                break;
+                            case 'Free Shipping':
+                                break;
+                            case 'Free Product':
+                                break;
+                            case 'Competition':
+                                break;
+                        }
+                    }
+                }
+                */
+                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+
+                // Decode tracking url from html snippet
+                $snippet = $voucher['IntegrationCode'];
+                if (!empty($snippet)) {
+                    $pos = strpos($snippet, 'http');
+                    if ($pos !== false) {
+                        $posQuote = strpos($snippet,'"', $pos);
+                        if ($posQuote === false) {
+                            $posQuote = strpos($snippet,' ', $pos);
+                        }
+                        if ($posQuote !== false) {
+                            $Deal->default_track_uri = substr($snippet, $pos, $posQuote - $pos);
+                        }
+                    }
+                }
+                $arrResult[] = $Deal;
             }
-            $Deal->code = $coupon['coupon-code'];
-            $arrResult->deals[] = $Deal;
         }
-        */
-        return $arrResult;
+        $result->deals[]=$arrResult;
+
+        return $result;
     }
 
     /**
