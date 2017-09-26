@@ -184,6 +184,10 @@ class Deal
                 if (strpos($dest, 'date') !== false) {
                     $this->$dest = $this->convertDate($source[$src]);
                 }
+                elseif (strpos($dest, 'is_') !== false) {
+                    $this->$dest = $this->convertBool($source[$src]);
+
+                }
                 else {
                     $this->$dest = $source[$src];
                 }
@@ -210,5 +214,20 @@ class Deal
             $date = \DateTime::createFromFormat('Y-m-d','2000-01-01 00:00:00');
         }
         return $date;
+    }
+
+    public function convertBool($source) {
+        // Try to convert source to boolean
+        $source = strtolower($source);
+        if ($source == 'yes' || $source == 'true' || $source == '1' || $source == 'oui') {
+            $value = true;
+        }
+        elseif ($source == 'no' || $source == 'false' || $source == '0' || $source == 'non') {
+            $value = false;
+        }
+        else {
+            $value = null;
+        }
+        return $value;
     }
 }

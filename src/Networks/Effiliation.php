@@ -95,24 +95,44 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
-        $url = 'http://apiv2.effiliation.com/apiv2/programs.json?filter=mines&key='.$this->_password;
+        $result = DealsResultset::createInstance();
+
+        $url = 'http://apiv2.effiliation.com/apiv2/commercialtrades.json?filter=mines&key='.$this->_password;
         $json = file_get_contents($url);
+
         $arrResult = array();
         $arrResponse = json_decode($json, true);
-        if(!is_array($arrResponse) || count($arrResponse) <= 0) {
+        if(!is_array($arrResponse) || count($arrResponse) <= 0 || !array_key_exists('supports', $arrResponse)) {
             return $arrResult;
         }
-        $arrPrograms = $arrResponse['programs'];
-        foreach($arrPrograms as $item) {
+        $arrPrograms = $arrResponse['supports'];
+        foreach($arrPrograms as $voucher) {
             $Deal = Deal::createInstance();
-            $Deal->merchant_ID = $item['id_programme'];
-            $Deal->code = $item['code'];
-            $Deal->name = $item['nom'];
-            $Deal->startDate = $item['date_debut'];
-            $Deal->description = $item['description'];
-            $Deal->url = $item['url_tracke'];
+            $Deal->setValues($voucher, [
+                'id_lien' => 'deal_ID' ,
+                'id_programme' => 'merchant_ID' ,
+                'date_debut' => 'start_date' ,
+                'date_fin' => 'end_date' ,
+                'nom' => 'name' ,
+                'description' => 'description' ,
+                'intitule' => 'code' ,
+                'url_redir' => 'default_track_uri' ,
+                'exclusivite' => 'is_exclusive' ,
+                'type' => 'deal_type',
+            ]);
+            switch ($voucher['type']) {
+                case 'Code de réduction':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    break;
+                case 'Bon plan':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+                default:
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+            }
             if($merchantID > 0) {
-                if($merchantID == $item['id_programme']) {
+                if($merchantID == $voucher['id_programme']) {
                     $arrResult[] = $Deal;
                 }
             }
@@ -121,7 +141,8 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
             }
         }
 
-        return $arrResult;
+        $result->deals[]=$arrResult;
+        return $result;
     }
 
     /**
