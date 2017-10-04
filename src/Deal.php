@@ -222,11 +222,8 @@ class Deal
         if ($source == 'yes' || $source == 'true' || $source == '1' || $source == 'oui') {
             $value = true;
         }
-        elseif ($source == 'no' || $source == 'false' || $source == '0' || $source == 'non') {
-            $value = false;
-        }
         else {
-            $value = null;
+            $value = false;
         }
         return $value;
     }
