@@ -24,7 +24,7 @@ class Belboon extends AbstractNetwork implements NetworkInterface
     private $_apiClient = null;
     private $_password = '';
     private $_idSite = '';
-    protected $_tracking_parameter    = '/ subid1';
+    protected $_tracking_parameter    = '/subid1';
 
     /**
      * @method __construct

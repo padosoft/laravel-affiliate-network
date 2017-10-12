@@ -161,16 +161,19 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
     {
         $arrResult = array();
+        // User passed $arrMerchantID, don't fill it with active merchants only - 2017-10-12 <PN>
+        /*
         if (count( $arrMerchantID ) < 1) {
             $merchants = $this->getMerchants();
             foreach ($merchants as $merchant) {
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom,$dateTo);
+        */
+        $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom,$dateTo);
         //echo "<br>merchants id array<br>".print_r($arrMerchantID);
         //$counter=0;
-        foreach($transcationList as $transaction) {
+        foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
