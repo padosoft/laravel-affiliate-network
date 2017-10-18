@@ -107,6 +107,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
             return array();
         }
         $arrResult = array();
+        /*
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
@@ -114,7 +115,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
             $Merchant->name = $merchant['name'];
             $arrResult[] = $Merchant;
         }
-
+        */
         return $arrResult;
     }
 
