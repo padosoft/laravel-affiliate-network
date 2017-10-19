@@ -76,7 +76,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
         $credentials["private_apikey"] = $private_key;
         $credentials["id_site"] = $idSite;
 
-        $credentials['country'] = $country;
+        $credentials['country'] = $this->_country;
         $this->_network->login($credentials);
         $this->_logged = true;
 
@@ -107,7 +107,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
             return array();
         }
         $arrResult = array();
-        /*
+
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
@@ -115,7 +115,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
             $Merchant->name = $merchant['name'];
             $arrResult[] = $Merchant;
         }
-        */
+
         return $arrResult;
     }
 
