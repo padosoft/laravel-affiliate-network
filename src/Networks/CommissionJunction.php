@@ -39,9 +39,13 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $passwordApi;
         $this->_passwordApi = $passwordApi;
-        $this->_website_id = $idSite;
-        $this->login( $this->_username, $this->_password ,$idSite);
-        // $this->_apiClient = \ApiClient::factory(PROTOCOL_JSON);
+        $idSite = $this->_website_id;
+
+        if (trim($idSite)!=''){
+            $this->addAllowedSite($idSite);
+        }
+
+        $this->login( $this->_username, $this->_password ,$this->_website_id);
     }
 
     /**
@@ -51,16 +55,22 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) && isNullOrEmpty( $password )) {
-
             return false;
         }
         $this->_username = $username;
         $this->_password = $password;
         $this->_passwordApi= $password;
+        $this->_website_id = $idSite;
         $credentials = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_username;
         $credentials["apipassword"] = $this->_passwordApi;
+        $credentials["id_site"] = $idSite;
+
+        if (trim($idSite)!=''){
+            $this->addAllowedSite($idSite);
+        }
+
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
@@ -95,58 +105,84 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-     * @param int $merchantID
-     * @return array of Deal
+     * @param null | int $merchantID
+     * @param int $page
+     * @param int $records_per_page
+     * @return DealsResultset array of Deal
      */
-    public function getDeals($merchantID = NULL, int $page = 0, int $items_per_page = 10): DealsResultset
+    public function getDeals($merchantID = NULL, int $page = 1, int $records_per_page = 100): DealsResultset
     {
-        if ($page<1){
-            $page=1;
+        if (empty($page)){
+            $page = 1;
+        }
+        if (empty($records_per_page)){
+            $records_per_page = 100;
+        }
+        if (empty($merchantID)){
+            $merchantID  = 'joined';
         }
         $arrResult = new DealsResultset();
-        $response = $this->_apiCall('https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id . '&advertiser-ids='.$merchantID.'&records-per-page='.$items_per_page.'&page-number='.$page);
-        //var_dump($response);
-        if ($response===false || \preg_match("/error/", $response)) {
-            return $arrResult;
-        }
+        $arrResult->items = $records_per_page;
 
+        while ((int) $arrResult->items >= (int) $records_per_page){
 
-        $arrResponse = xml2array($response);
+            try {
+                //<JC> 2017-10-23  (valid keys are: advertiser-ids, category, event-name, keywords, language, link-type, page-number, promotion-end-date, promotion-start-date, promotion-type, records-per-page, website-id)
+                $response = $this->_apiCall(
+                    'https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id .
+                    '&advertiser-ids=' . $merchantID .
+                    '&records-per-page=' . $records_per_page .
+                    '&page-number=' . $page .
+                    '&promotion-type=coupon'
+                );
 
-        if (!is_array($arrResponse) || count($arrResponse) <= 0) {
-            return $arrResult;
-        }
-        if (!isset($arrResponse['cj-api']['links'])){
-            return $arrResult;
-        }
-        $arrResult->page=$arrResponse['cj-api']['links_attr']['page-number'];
-        $arrResult->items=$arrResponse['cj-api']['links_attr']['records-returned'];
-        $arrResult->total=$arrResponse['cj-api']['links_attr']['total-matched'];
-        ($arrResult->total>0)?$arrResult->num_pages=(int)ceil($arrResult->total/$items_per_page):$arrResult->num_pages=0;
-        $arrCoupon = $arrResponse['cj-api']['links']['link'];
+                if ($response===false || \preg_match("/error/", $response)) {
+                    return $arrResult;
+                }
 
-        foreach ($arrCoupon as $coupon) {
-            //  var_dump($coupon);
-            $Deal = Deal::createInstance();
-            $Deal->id = $coupon['link-id'];
-            $Deal->name = $coupon['link-name'];
-            $Deal->description = $coupon['description'];
-            $Deal->note = $coupon['description'];
-            $Deal->merchant_ID = $coupon['advertiser-id'];
-            $Deal->merchant_name = $coupon['advertiser-name'];
-            $Deal->ppc = $coupon['clickUrl'];
-            $Deal->description = $coupon['description'];
-            if (!empty($coupon['promotion-start-date'])) {
-                $startDate = new \DateTime($coupon['promotion-start-date']);
-                $Deal->startDate = $startDate;
-                $Deal->created_at = $startDate;
+                $arrResponse = xml2array($response);
+
+                if (!is_array($arrResponse) || count($arrResponse) <= 0) {
+                    return $arrResult;
+                }
+                if (!isset($arrResponse['cj-api']['links'])){
+                    return $arrResult;
+                }
+                $arrResult->page=$arrResponse['cj-api']['links_attr']['page-number'];
+                $arrResult->items=$arrResponse['cj-api']['links_attr']['records-returned'];
+                $arrResult->total=$arrResponse['cj-api']['links_attr']['total-matched'];
+                ($arrResult->total > 0) ? $arrResult->num_pages = (int)ceil($arrResult->total / $records_per_page) : $arrResult->num_pages = 0;
+                $a_links = $arrResponse['cj-api']['links']['link'];
+
+                foreach ($a_links as $link) {
+                    $Deal = Deal::createInstance();
+                    $Deal->deal_ID = $link['link-id'];
+                    $Deal->name = $link['link-name'];
+                    $Deal->language = $link['language'];
+                    $Deal->description = $link['description'];
+                    $Deal->note = $link['description'];
+                    $Deal->merchant_ID = $link['advertiser-id'];
+                    $Deal->merchant_name = $link['advertiser-name'];
+                    $Deal->default_track_uri = $link['clickUrl'];
+                    $Deal->description = $link['description'];
+                    $Deal->title = $link['link-name'];
+                    if (!empty($link['promotion-start-date'])) {
+                        $startDate = new \DateTime($link['promotion-start-date']);
+                        $Deal->start_date = $startDate;
+                    }
+                    if (!empty($link['promotion-end-date'])) {
+                        $endDate = new \DateTime($link['promotion-end-date']);
+                        $Deal->end_date = $endDate;
+                    }
+                    $Deal->code = $link['coupon-code'];
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    $arrResult->deals[0][] = $Deal;
+                }
+                $page++;
             }
-            if (!empty($coupon['promotion-end-date'])) {
-                $endDate = new \DateTime($coupon['promotion-end-date']);
-                $Deal->endDate = $endDate;
+            catch (\Exception $e){
+                return $arrResult;
             }
-            $Deal->code = $coupon['coupon-code'];
-            $arrResult->deals[] = $Deal;
         }
 
         return $arrResult;
@@ -258,4 +294,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     {
         return $this->_tracking_parameter;
     }
+
+    public function addAllowedSite($idSite){
+        if (trim($idSite)!=''){
+            $this->_network->addAllowedSite($idSite);
+        }
+    }
+
 }
