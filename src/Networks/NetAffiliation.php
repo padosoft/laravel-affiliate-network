@@ -132,7 +132,14 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
             $Deal->code = $item['code'];
             $Deal->name = $item['title'];
             $Deal->start_date = $item['startdate'];
-            $Deal->end_date = $item['enddate'];
+            if (is_array($item['enddate'])) {
+                if (count($item['enddate'] == 0)) {
+                    $Deal->end_date = '0000-00-00 00:00:00';
+                }
+            }
+            else {
+                $Deal->end_date = $item['enddate'];
+            }
             $Deal->description = $item['description'];
             $Deal->url = $item['link'];
             $Deal->deal_ID = md5($item['link']);    // Use link to generate a unique deal ID
