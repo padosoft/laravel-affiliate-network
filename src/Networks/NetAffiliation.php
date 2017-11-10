@@ -115,7 +115,9 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
-        $url = 'http://flux.netaffiliation.com/rsscp.php?sec=417771E811773642F4E017';
+        $result = DealsResultset::createInstance();
+
+        $url = 'http://flux.netaffiliation.com/rsscp.php?mode=x&sec=' . $_ENV['NETAFFILIATION_SECKEY'];
         $xml = file_get_contents($url);
         $arrResult = array();
         $arrResponse = xml2array($xml);
@@ -123,16 +125,17 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
             return $arrResult;
         }
 
-        $arrItems = $arrResponse['rss']['channel']['item'];
+        $arrItems = $arrResponse['listing']['item'];
         foreach($arrItems as $item) {
             $Deal = Deal::createInstance();
             $Deal->merchant_ID = $item['idcamp'];
             $Deal->code = $item['code'];
             $Deal->name = $item['title'];
-            $Deal->startDate = $item['startdate'];
-            $Deal->endDate = $item['enddate'];
+            $Deal->start_date = $item['startdate'];
+            $Deal->end_date = $item['enddate'];
             $Deal->description = $item['description'];
             $Deal->url = $item['link'];
+            $Deal->deal_ID = md5($item['link']);    // Use link to generate a unique deal ID
             if($merchantID > 0) {
                 if($merchantID == $item['idcamp']) {
                     $arrResult[] = $Deal;
@@ -142,9 +145,8 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
                 $arrResult[] = $Deal;
             }
         }
-
-        return $arrResult;
-
+        $result->deals[]=$arrResult;
+        return $result;
     }
 
     /**
