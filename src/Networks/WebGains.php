@@ -23,6 +23,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
     private $_network = null;
     private $_username = '';
     private $_password = '';
+    private $_idSite = '';
     private $_apiClient = null;
     protected $_tracking_parameter    = 'clickref';
 
@@ -34,6 +35,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
         $this->_network = new \Oara\Network\Publisher\WebGains;
         $this->_username = $username;
         $this->_password = $password;
+        $this->_idSite = $idSite;
         $apiUrl = 'http://ws.webgains.com/aws.php';
         $this->_apiClient = new \SoapClient($apiUrl,
             array('login' => $this->_username,
@@ -53,6 +55,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
         }
         $this->_username = $username;
         $this->_password = $password;
+        $this->_idSite = $idSite;
         $credentials = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
@@ -90,38 +93,62 @@ class WebGains extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-     * @param int $merchantID
+     * @param int $merchantID to filter only one merchant
      * @return array of Deal
      */
-    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
+    public function getDeals($merchantID = null, int $page = 0, int $items_per_page = 10): DealsResultset
     {
+
+        $result = DealsResultset::createInstance();
         $arrResult = array();
-        $arrResponse = $this->_apiClient->getFullEarnings(null, null, null, $this->_username, $this->_password);
-        foreach($arrResponse as $response) {
-            $Deal = Deal::createInstance();
-            $Deal->transaction_ID = $response->transactionID;
-            $Deal->affiliate_ID = $response->affiliate_ID;
-            $Deal->campaign_name = $response->campaignName;
-            $Deal->campaign_ID = $response->campaignID;
-            $date = new \DateTime($response->date);
-            $Deal->date = $response->date;
-            $Deal->programName = $response->program_name;
-            $Deal->merchant_ID = $response->programID;
-            $Deal->commission = $response->commission;
-            $Deal->amount = $response->saleValue;
-            $Deal->status = $response->status;
-            $Deal->referrer = $response->referrer;
-            if($merchantID > 0) {
-                if($merchantID == $response->programID) {
-                    $arrResult[] = $Deal;
+        if (!empty($this->_idSite)) {
+            // Account id is correct
+            $arrVouchers = $this->_network->getVouchers($this->_idSite);
+
+            foreach ($arrVouchers as $obj_voucher) {
+
+                $voucher = str_getcsv($obj_voucher, ',', '"');
+
+                if (count($voucher) < 12) {
+                    continue;
                 }
-            }
-            else {
+                $voucher_id = $voucher[0];
+                $voucher_id = str_replace("\n", '', $voucher_id);
+                $advertiserId = $voucher[1];
+                $code = $voucher[7];
+                if ($voucher_id == "Voucher ID" || !is_numeric($advertiserId) || $code == "Code") {
+                    continue;
+                }
+                $starts = $voucher[4];
+                $ends = $voucher[5];
+                $deeplink_tracking = $voucher[6];
+                $description = $voucher[11];
+                $discount = abs((int)$voucher[8]);
+                $is_percentage = (bool)(strpos($voucher[8], '%') !== false);
+
+                if ($merchantID > 0) {
+                    if ($advertiserId != $merchantID) {
+                        continue;
+                    }
+                }
+
+                $Deal = Deal::createInstance();
+                $Deal->deal_ID = $voucher_id;
+                $Deal->merchant_ID = $advertiserId;
+                $Deal->code = $code;
+                $Deal->description = $description;
+                $Deal->start_date = $Deal->convertDate($starts . ' 00:00:00');
+                $Deal->end_date = $Deal->convertDate($ends . ' 23:59:59');
+                $Deal->default_track_uri = $deeplink_tracking;
+                $Deal->is_exclusive = false;
+                $Deal->discount_amount = $discount;
+                $Deal->is_percentage = $is_percentage;
+                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
                 $arrResult[] = $Deal;
             }
         }
-
-        return $arrResult;
+        $result->deals[]=$arrResult;
+        return $result;
     }
 
     /**
