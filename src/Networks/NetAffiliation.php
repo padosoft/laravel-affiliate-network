@@ -141,7 +141,7 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
                 $Deal->end_date = $item['enddate'];
             }
             $Deal->description = $item['description'];
-            $Deal->url = $item['link'];
+            $Deal->default_track_uri = $item['link'];
             $Deal->deal_ID = md5($item['link']);    // Use link to generate a unique deal ID
             if($merchantID > 0) {
                 if($merchantID == $item['idcamp']) {
