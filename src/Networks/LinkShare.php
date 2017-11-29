@@ -92,7 +92,13 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
+
+        $result = DealsResultset::createInstance();
+
         $arrResult = array();
+
+        // TODO
+        /*
         $arrResponse = $this->_apiClient->getFullEarnings(null, null, null, $this->_username, $this->_password);
         foreach($arrResponse as $response) {
             $Deal = Deal::createInstance();
@@ -117,8 +123,12 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
                 $arrResult[] = $Deal;
             }
         }
+        */
 
-        return $arrResult;
+        $result->deals[]=$arrResult;
+
+        return $result;
+;
     }
 
     /**
