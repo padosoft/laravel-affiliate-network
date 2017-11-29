@@ -214,6 +214,9 @@ class Deal
             $date = \DateTime::createFromFormat('d/m/Y',$source);
         }
         if ($date === false) {
+            $date = \DateTime::createFromFormat('Y-m-d',$source);
+        }
+        if ($date === false) {
             $date = \DateTime::createFromFormat('Y-m-d','2000-01-01 00:00:00');
         }
         return $date;

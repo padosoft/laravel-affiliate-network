@@ -92,38 +92,29 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
     {
-
-        $result = DealsResultset::createInstance();
-
         $arrResult = array();
 
-        // TODO
-        /*
-        $arrResponse = $this->_apiClient->getFullEarnings(null, null, null, $this->_username, $this->_password);
-        foreach($arrResponse as $response) {
+        $apiKey = $_ENV['LINKSHARE_TOKEN'];
+        $network = $_ENV['LINKSHARE_NETWORK'];
+        $result = DealsResultset::createInstance();
+
+        $arrVouchers = $this->_network->getVouchers($apiKey, $network);
+
+        foreach($arrVouchers as $voucher) {
             $Deal = Deal::createInstance();
-            $Deal->transaction_ID = $response->transactionID;
-            $Deal->affiliate_ID = $response->affiliate_ID;
-            $Deal->campaign_name = $response->campaignName;
-            $Deal->campaign_ID = $response->campaignID;
-            $date = new \DateTime($response->date);
-            $Deal->date = $response->date;
-            $Deal->programName = $response->program_name;
-            $Deal->merchant_ID = $response->programID;
-            $Deal->commission = $response->commission;
-            $Deal->amount = $response->saleValue;
-            $Deal->status = $response->status;
-            $Deal->referrer = $response->referrer;
-            if($merchantID > 0) {
-                if($merchantID == $response->programID) {
-                    $arrResult[] = $Deal;
-                }
-            }
-            else {
-                $arrResult[] = $Deal;
-            }
+            $Deal->deal_ID = md5($voucher['tracking']);    // Use link to generate a unique deal ID
+            $Deal->merchant_ID = $voucher['advertiser_id'];
+            $Deal->code = $voucher['code'];
+            $Deal->description = $voucher['description'] . ' ' . $voucher['restriction'];
+            $Deal->start_date = $Deal->convertDate($voucher['start_date']);
+            $Deal->start_date->setTime(0,0,0);
+            $Deal->end_date = $Deal->convertDate($voucher['end_date']);
+            $Deal->end_date->setTime(23,59,59);
+            $Deal->default_track_uri = $voucher['tracking'];
+            $Deal->is_exclusive = false;
+            $Deal->deal_type = $voucher['type'];
+            $arrResult[] = $Deal;
         }
-        */
 
         $result->deals[]=$arrResult;
 
