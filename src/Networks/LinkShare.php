@@ -101,19 +101,21 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
         $arrVouchers = $this->_network->getVouchers($apiKey, $network);
 
         foreach($arrVouchers as $voucher) {
-            $Deal = Deal::createInstance();
-            $Deal->deal_ID = md5($voucher['tracking']);    // Use link to generate a unique deal ID
-            $Deal->merchant_ID = $voucher['advertiser_id'];
-            $Deal->code = $voucher['code'];
-            $Deal->description = $voucher['description'] . ' ' . $voucher['restriction'];
-            $Deal->start_date = $Deal->convertDate($voucher['start_date']);
-            $Deal->start_date->setTime(0,0,0);
-            $Deal->end_date = $Deal->convertDate($voucher['end_date']);
-            $Deal->end_date->setTime(23,59,59);
-            $Deal->default_track_uri = $voucher['tracking'];
-            $Deal->is_exclusive = false;
-            $Deal->deal_type = $voucher['type'];
-            $arrResult[] = $Deal;
+            if (!empty($voucher['tracking']) && !empty($voucher['advertiser_id'])) {
+                $Deal = Deal::createInstance();
+                $Deal->deal_ID = md5($voucher['tracking']);    // Use link to generate a unique deal ID
+                $Deal->merchant_ID = $voucher['advertiser_id'];
+                $Deal->code = $voucher['code'];
+                $Deal->description = $voucher['description'] . ' ' . $voucher['restriction'];
+                $Deal->start_date = $Deal->convertDate($voucher['start_date']);
+                $Deal->start_date->setTime(0, 0, 0);
+                $Deal->end_date = $Deal->convertDate($voucher['end_date']);
+                $Deal->end_date->setTime(23, 59, 59);
+                $Deal->default_track_uri = $voucher['tracking'];
+                $Deal->is_exclusive = false;
+                $Deal->deal_type = $voucher['type'];
+                $arrResult[] = $Deal;
+            }
         }
 
         $result->deals[]=$arrResult;
