@@ -73,6 +73,9 @@ class EffiliationEx extends EffiliationOara{
                     }
                     $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
                     $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
+                    // Get absolute values - 2017-12-13 <PN>
+                    $transaction ['amount'] = \abs($transaction ['amount']);
+                    $transaction ['commission'] = \abs($transaction ['commission']);
                     $totalTransactions[] = $transaction;
                 // }
             }

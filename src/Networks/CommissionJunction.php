@@ -223,11 +223,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             }
             $Transaction->merchant_ID = $transaction['merchantId'];
             //original	Displays either a '1' indicating an original transaction or a '0' indicating a non-original or correction transaction.
-            //considero transazioni valide solo quelle di tipo original come viene fatto dal report consultabile sul sito web di c.j.
-            if ($transaction['original'] == 'true') {
+            // considero transazioni valide solo quelle di tipo original come viene fatto dal report consultabile sul sito web di c.j.
+            // Don't check for 'original' to get DECLINED transactions - 2017-12-13 <PN>
+            // if ($transaction['original'] == 'true') {
                 $arrResult[] = $Transaction;
-                //$counter++;
-            }
+            // }
             /*
             echo "custom_id ".$transaction['custom_id']." unique_id ".$transaction['unique_id']." aid ".$transaction['aid']." commission-id ".$transaction['commission-id'].
             " order-id ".$transaction['order-id']." original ".$transaction['original']."<br>";
