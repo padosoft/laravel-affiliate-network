@@ -46,7 +46,9 @@ class EffiliationEx extends EffiliationOara{
                     $transaction = Array();
                     $merchantId = (int)$transactionExportArray[2];
                     $transaction['merchantId'] = $merchantId;
-                    $transaction['date'] = $transactionExportArray[10];
+                    // Changed Transaction date index from 10 to 12 - 2018-01-01 <PN>
+                    $transaction['date'] = $transactionExportArray[12];
+                    $transaction["click_date"] = $transactionExportArray[11]; // Added <PN>
                     $transaction['unique_id'] = $transactionExportArray[0];
                     $transaction['custom_id'] = '';
                     $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
