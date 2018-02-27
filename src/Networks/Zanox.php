@@ -134,6 +134,13 @@ class Zanox extends AbstractNetwork implements NetworkInterface
         $result->items=$Response->items;
         $result->total=$Response->total;
         // ($Response->total>0)?$result->num_pages=(int)ceil($Response->total/$items_per_page):$result->num_pages=0;
+        // Check if items exists - 2018-02-27 <PN>
+        if (!property_exists($Response, 'incentiveItems')) {
+            return $result;
+        }
+        if (!property_exists($Response->incentiveItems, 'incentiveItem')) {
+            return $result;
+        }
         $arrAdmediumItems = $Response->incentiveItems->incentiveItem;
 
         foreach ($arrAdmediumItems as $admediumItems) {
