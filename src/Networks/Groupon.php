@@ -30,7 +30,7 @@ class Groupon extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password, string $idSite='')
+    public function __construct(string $username, string $password, string $idSite='', string $country = null)
     {
         $this->_network = new GrouponEx;
         $this->_username = $username;
@@ -38,6 +38,9 @@ class Groupon extends AbstractNetwork implements NetworkInterface
         if (trim($idSite)!=''){
             // Groupon needs Site to filter countries
             $this->addAllowedSite($idSite);
+        }
+        if (!empty($country)) {
+            $this->addCountry(strtoupper($country));
         }
         $this->login( $this->_username, $this->_password );
     }
@@ -48,10 +51,15 @@ class Groupon extends AbstractNetwork implements NetworkInterface
         }
     }
 
-    public function login(string $username, string $password,string $idSite=''): bool{
+    public function addCountry($country){
+        if (!empty($country)){
+            $this->_network->addCountry($country);
+        }
+    }
+
+    public function login(string $username, string $password, string $idSite='', string $country = null): bool {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
-
             return false;
         }
         $this->_username = $username;
@@ -59,6 +67,9 @@ class Groupon extends AbstractNetwork implements NetworkInterface
         if (trim($idSite)!=''){
             // Ebay needs Site to filter countries
             $this->addAllowedSite($idSite);
+        }
+        if (!empty($country)) {
+            $this->_network->addCountry(strtoupper($country));
         }
         $credentials = array();
         $credentials["user"] = $this->_username;
@@ -68,7 +79,6 @@ class Groupon extends AbstractNetwork implements NetworkInterface
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
         }
-
         return $this->_logged;
     }
 
@@ -134,8 +144,8 @@ class Groupon extends AbstractNetwork implements NetworkInterface
             if (isset($transaction['post_date']) && !empty($transaction['post_date'])) {
                 $Transaction->update_date = new \DateTime($transaction['post_date']);
             }
-            $Transaction->merchant_ID = $transaction['merchantId'];
-            $Transaction->campaign_name =  $transaction['merchantName'];
+            // $Transaction->merchant_ID = $transaction['merchantId'];
+            // $Transaction->campaign_name =  $transaction['merchantName'];
             // $Transaction->IP =  $transaction['IP'];
             $Transaction->approved = false;
             if ($Transaction->status==\Oara\Utilities::STATUS_CONFIRMED){
