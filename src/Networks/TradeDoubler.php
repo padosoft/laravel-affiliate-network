@@ -70,7 +70,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        return $this->_logged;;
+        return $this->_logged;
     }
 
     /**

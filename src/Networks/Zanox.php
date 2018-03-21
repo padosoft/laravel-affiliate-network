@@ -149,7 +149,7 @@ class Zanox extends AbstractNetwork implements NetworkInterface
             $Deal->start_date = $Deal->convertDate($admediumItems->startDate);
             isset($admediumItems->endDate) ? $Deal->end_date = $Deal->convertDate($admediumItems->endDate): $Deal->end_date = '2099-12-31';
             $Deal->name = $admediumItems->name;
-            $Deal->code = $admediumItems->couponCode;
+            isset($admediumItems->couponCode) ? $Deal->code = $admediumItems->couponCode : $Deal->code = '';
             $Deal->description = $admediumItems->info4customer;
             $Deal->information = $admediumItems->info4publisher.' '.$admediumItems->restrictions;
             $Deal->is_percentage = 0;
