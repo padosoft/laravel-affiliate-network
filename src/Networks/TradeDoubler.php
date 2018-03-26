@@ -201,6 +201,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
             $Transaction->commission = $transaction['commission'];
+            $Transaction->currency = $transaction['currency'];
             $arrResult[] = $Transaction;
         }
 

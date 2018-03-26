@@ -13,10 +13,17 @@ class TradeDoublerEx extends TradeDoublerOara
         $updateTransactions = Array();
         $totalTransactions = Array();
 
+        if (isset($_ENV['TRADEDOUBLER_CURRENCY'])) {
+            $currency = $_ENV['TRADEDOUBLER_CURRENCY'];
+        }
+        else {
+            $currency = 'EUR';
+        }
+
         // Get updated transactions in date range
-        $updatedTransactions = self::getTransactionListByDateType($merchantList, $dStartDate, $dEndDate, true);
+        $updatedTransactions = self::getTransactionListByDateType($merchantList, $dStartDate, $dEndDate, true, $currency);
         // Get new transactions in date range
-        $insertedTransactions= self::getTransactionListByDateType($merchantList, $dStartDate, $dEndDate, false);
+        $insertedTransactions= self::getTransactionListByDateType($merchantList, $dStartDate, $dEndDate, false, $currency);
 
         $parsedIDs=[];
         foreach ($insertedTransactions as $transaction){
@@ -69,7 +76,7 @@ class TradeDoublerEx extends TradeDoublerOara
         return $totalTransactions;
     }
 
-    public function getTransactionListByDateType($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null, bool $byDateUpdated = false)
+    public function getTransactionListByDateType($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null, bool $byDateUpdated = false, $currency = null)
     {
         $transactions = Array();
 
@@ -108,6 +115,7 @@ class TradeDoublerEx extends TradeDoublerOara
             new \Oara\Curl\Parameter('metric1.operator1', '/'),
             new \Oara\Curl\Parameter('latestDayToExecute', '0'),
             new \Oara\Curl\Parameter('showAdvanced', 'true'),
+            new \Oara\Curl\Parameter('currencyId', $currency),              // Added <PN> 2018-03-26
             new \Oara\Curl\Parameter('breakdownOption', '1'),
             new \Oara\Curl\Parameter('metric1.midFactor', ''),
             new \Oara\Curl\Parameter('reportTitleTextKey', 'REPORT3_SERVICE_REPORTS_AAFFILIATEEVENTBREAKDOWNREPORT_TITLE'),
@@ -196,6 +204,7 @@ class TradeDoublerEx extends TradeDoublerOara
 
                         $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[21]);
                         $transaction['event_id'] = $transactionExportArray[11];
+                        $transaction['currency'] = $currency;
                         $transactions[] = $transaction;
                     }
                 }

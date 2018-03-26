@@ -228,6 +228,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                         //echo $transaction->saleAmount->amount."<br>";
                         $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
                         $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
+                        $myTransaction->currency = $transaction->commissionAmount->currency;    // 2018-03-26 <PN>
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
                         //echo "stepE ";
