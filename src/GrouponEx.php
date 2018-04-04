@@ -133,9 +133,9 @@ class GrouponEx extends GrouponOara
                         $transaction['custom_id'] = $transactionExportArray[1];
                     }
 
-                    if ($transactionExportArray[5] == 'VALID' || $transactionExportArray[5] == 'REFUNDED') {
+                    if ($transactionExportArray[5] == 'VALID') {
                         $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else if ($transactionExportArray[5] == 'INVALID') {
+                    } else if ($transactionExportArray[5] == 'INVALID' || $transactionExportArray[5] == 'REFUNDED') {
                         $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
                     } else {
                         throw new \Exception("Status {$transactionExportArray[5]} unknown");
