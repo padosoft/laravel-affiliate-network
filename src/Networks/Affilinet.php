@@ -202,6 +202,7 @@ class Affilinet extends AbstractNetwork implements NetworkInterface
                 $myTransaction->custom_ID = $transaction['custom_id'];
                 $myTransaction->unique_ID = $transaction['unique_id'];
                 $myTransaction->commission = $transaction['commission'];
+                $myTransaction->currency = $transaction['currency'];
                 if (!empty($transaction['date'])) {
                     $date = new \DateTime($transaction['date']);
                     $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');

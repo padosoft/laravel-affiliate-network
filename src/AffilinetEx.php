@@ -19,6 +19,15 @@ class AffilinetEx extends AffilinetOara
         // Don't need merchant list here
         // $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
+
+        if (isset($_ENV['AFFILINET_CURRENCY'])) {
+            // 2018-04-16 - <PN>
+            $currency = $_ENV['AFFILINET_CURRENCY'];
+        }
+        else {
+            $currency = 'EUR';
+        }
+
         $step = 0;
 
         try {
@@ -50,6 +59,7 @@ class AffilinetEx extends AffilinetOara
                         $transaction["status"] = $transactionObject->TransactionStatus;
                         $transaction["unique_id"] = $transactionObject->TransactionId;
                         $transaction["commission"] = $transactionObject->PublisherCommission;
+                        $transaction["currency"] = $currency;   // 2018-04-16 - <PN>
                         $transaction["amount"] = $transactionObject->NetPrice;
                         $transaction["date"] = $transactionObject->RegistrationDate;
                         $transaction["click_date"] = $transactionObject->ClickDate;         // Future use - <PN>
