@@ -19,6 +19,36 @@ class Merchant
     public $name = '';
 
     /**
+     * @var string
+     */
+    public $url = null;
+
+    /**
+     * @var string
+     */
+    public $brand_name = null;
+
+    /**
+     * @var string
+     */
+    public $status = null;
+
+    /**
+     * @var string
+     */
+    public $launch_date = null;
+
+    /**
+     * @var string
+     */
+    public $application_date = null;
+
+    /**
+     * @var string
+     */
+    public $termination_date = null;
+
+    /**
      * @method createInstance
      * @return obj istance
      */
