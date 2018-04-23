@@ -80,8 +80,10 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
-            $Merchant->merchant_ID = $merchant->id;
-            $Merchant->name = $merchant->name;
+            $Merchant->merchant_ID = $merchant['cid'];
+            $Merchant->name = $merchant['name'];
+            $Merchant->url = $merchant['url'];
+            $Merchant->status = $merchant['status'];
             $arrResult[] = $Merchant;
         }
 

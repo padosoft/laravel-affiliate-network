@@ -86,6 +86,9 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
+            // Added more info - 2018-04-23 <PN>
+            $Merchant->status = $merchant['status'];
+            $Merchant->url = $merchant['url'];
             $arrResult[] = $Merchant;
         }
 

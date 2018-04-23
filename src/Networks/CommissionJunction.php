@@ -95,9 +95,21 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
         foreach ($merchantList as $merchant) {
+            if ($merchant['status'] == 'Setup') {
+                // Ignore setup programs not yet active
+                continue;
+            }
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
+            // Added more info - 2018-04-23 <PN>
+            $Merchant->url = $merchant['url'];
+            if ($merchant['status'] == 'Active') {
+                $Merchant->status = $merchant['relationship_status'];
+            }
+            else {
+                $Merchant->status = $merchant['status'];
+            }
             $arrResult[] = $Merchant;
         }
 
