@@ -82,6 +82,10 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
             $Merchant->launch_date = (string)$merchant->date_debut;
             $Merchant->termination_date = (string)$merchant->date_fin;
             $Merchant->status = (string)$merchant->etat;
+            if (empty($Merchant->status)) {
+                // Empty means "not applied"
+                $Merchant->status = 'not-applied';
+            }
             $Merchant->url = (string)$merchant->url;
             $arrResult[] = $Merchant;
         }

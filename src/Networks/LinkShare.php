@@ -80,9 +80,10 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
+            $Merchant->status = $merchant['status'];
+            $Merchant->termination_date = $merchant['termination_date'];
             $arrResult[] = $Merchant;
         }
-
         return $arrResult;
     }
 
