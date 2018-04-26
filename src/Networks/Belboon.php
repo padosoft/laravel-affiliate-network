@@ -79,6 +79,8 @@ class Belboon extends AbstractNetwork implements NetworkInterface
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
+            $Merchant->status = $merchant['status'];
+            $Merchant->url = $merchant['url'];
             $arrResult[] = $Merchant;
         }
 
