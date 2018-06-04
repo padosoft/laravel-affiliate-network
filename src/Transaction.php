@@ -114,6 +114,12 @@ class Transaction
     public $IP = '';       // Future use - <PN>
 
     /**
+     * @var string
+     */
+    public $user_ID = '';   // Future use - <PN>
+
+
+    /**
      * @method createInstance
      * @return obj istance
      */
