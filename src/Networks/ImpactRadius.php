@@ -1,5 +1,4 @@
 <?php
-
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Transaction;
@@ -9,14 +8,14 @@ use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
-use Padosoft\AffiliateNetwork\AffiliateWindowEx;
 use Padosoft\AffiliateNetwork\ProductsResultset;
+use \Oara\Network\Publisher\Smg;
 
 /**
- * Class AffiliateWindow
+ * Class ImpactRadius
  * @package Padosoft\AffiliateNetwork\Networks
  */
-class AffiliateWindow extends AbstractNetwork implements NetworkInterface
+class ImpactRadius extends AbstractNetwork implements NetworkInterface
 {
     /**
      * @var object
@@ -26,14 +25,15 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
     private $_username = '';
     private $_password = '';
     private $_logged    = false;
-    protected $_tracking_parameter    = 'clickref';
+    protected $_tracking_parameter    = 'subId1';
 
     /**
      * @method __construct
      */
     public function __construct(string $username, string $password)
     {
-        $this->_network = new AffiliateWindowEx;
+        $this->_network = new \Oara\Network\Publisher\Smg;
+
         $this->_username = $username;
         $this->_password = $password;
         $this->_apiClient = null;
@@ -56,7 +56,6 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             $this->_logged = true;
 
         }
-
         return $this->_logged;
     }
 
@@ -79,6 +78,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
+            // TODO
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
@@ -86,7 +86,6 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             $Merchant->status = $merchant['status'];
             $arrResult[] = $Merchant;
         }
-
         return $arrResult;
     }
 
@@ -100,13 +99,12 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
     public function getDeals($merchantID,int $page=0,int $items_per_page=10) : DealsResultset
     {
         $result = DealsResultset::createInstance();
-
-        if (!isset($_ENV['AWIN_API_VOUCHER_KEY'])) {
-            throw new \Exception("Awin api key not defined");
-        }
-        $apiKey = $_ENV['AWIN_API_VOUCHER_KEY'];
-
         $arrResult = array();
+
+        // TODO
+        /*
+        $apiKey = '';   // TODO
+
         $arrVouchers = $this->_network->getVouchers($apiKey);
 
         foreach($arrVouchers as $obj_voucher) {
@@ -155,6 +153,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
             $arrResult[] = $Deal;
         }
+        */
         $result->deals[]=$arrResult;
 
         return $result;
@@ -167,41 +166,25 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
      * @return array of Transaction
      */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
-    {/*
-        if (!$this->checkLogin()) {
-            return array();
-        }*/
-        //echo "go";
+    {
         $arrResult = array();
-        /*
-        if (count( $arrMerchantID ) < 1) {
-            $merchants = $this->getMerchants();
-            foreach ($merchants as $merchant) {
-                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
-            }
-        }*/
 
         try {
             // Added timezone parameter
             $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo, 'UTC');
 
             if (is_array($transactionList)) {
-                //echo "stepC ";
                 foreach ($transactionList as $transaction) {
                     try {
-/*
-                        var_dump(json_encode($transaction));
-                        echo "<br><br><br><br>";
-*/
                         $myTransaction = Transaction::createInstance();
 
+                        // TODO
+                        /*
                         $myTransaction->merchant_ID = $transaction->advertiserId;
                         $myTransaction->date = $transaction->transactionDate;
-                        //echo $transaction->transactionDate."<br>";
                         if (!empty($transaction->transactionDate)) {
                             $date = new \DateTime($transaction->transactionDate, new \DateTimeZone('UTC'));
                             $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
-                            //var_dump($date);
                         }
                         $myTransaction->unique_ID = $transaction->id;
                         if (is_object($transaction->clickRefs)) {
@@ -231,19 +214,18 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                         $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
                         $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
                         $myTransaction->currency = $transaction->commissionAmount->currency;    // 2018-03-26 <PN>
+                        */
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
                         //echo "stepE ";
-                        echo "<br><br>Transaction Error AffiliateWindow, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                        echo "<br><br>Transaction Error Impact Radius, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
                         var_dump($e->getTraceAsString());
-                        //throw new \Exception($e);
                     }
                 }
             }
-            //echo "stepD ";
         } catch (\Exception $e) {
             //echo "stepE ";
-            echo "<br><br>Generic Error AffiliateWindow: ".$e->getMessage()."<br><br>";
+            echo "<br><br>Generic Error Impact Radius: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
         }
@@ -258,7 +240,8 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
-        return array();        
+        // TODO
+        throw new \Exception("Not implemented yet");
     }
 
 
@@ -273,6 +256,9 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
         throw new \Exception("Not implemented yet");
     }
 
+    /**
+     * @return string
+     */
     public function getTrackingParameter(){
         return $this->_tracking_parameter;
     }
