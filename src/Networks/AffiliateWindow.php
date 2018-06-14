@@ -13,7 +13,7 @@ use Padosoft\AffiliateNetwork\AffiliateWindowEx;
 use Padosoft\AffiliateNetwork\ProductsResultset;
 
 /**
- * Class TradeDoubler
+ * Class AffiliateWindow
  * @package Padosoft\AffiliateNetwork\Networks
  */
 class AffiliateWindow extends AbstractNetwork implements NetworkInterface
@@ -183,11 +183,11 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
 
         try {
             // Added timezone parameter
-            $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo, 'UTC');
+            $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo, 'UTC');
 
-            if (is_array($transcationList)) {
+            if (is_array($transactionList)) {
                 //echo "stepC ";
-                foreach ($transcationList as $transaction) {
+                foreach ($transactionList as $transaction) {
                     try {
 /*
                         var_dump(json_encode($transaction));
@@ -234,7 +234,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
                         //echo "stepE ";
-                        echo "<br><br>errore transazione AffiliateWindow, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                        echo "<br><br>Transaction Error AffiliateWindow, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
                         var_dump($e->getTraceAsString());
                         //throw new \Exception($e);
                     }
@@ -243,7 +243,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             //echo "stepD ";
         } catch (\Exception $e) {
             //echo "stepE ";
-            echo "<br><br>errore generico transazione AffiliateWindow: ".$e->getMessage()."<br><br>";
+            echo "<br><br>Generic Error AffiliateWindow: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
         }
