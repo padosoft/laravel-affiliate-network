@@ -9,7 +9,7 @@ use Padosoft\AffiliateNetwork\Deal;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
 use Padosoft\AffiliateNetwork\ProductsResultset;
-use \Oara\Network\Publisher\Smg;
+use \Oara\Network\Publisher\ImpactRadius as OaraImpactRadius;
 
 /**
  * Class ImpactRadius
@@ -32,7 +32,7 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
      */
     public function __construct(string $username, string $password)
     {
-        $this->_network = new \Oara\Network\Publisher\Smg;
+        $this->_network = new OaraImpactRadius;
 
         $this->_username = $username;
         $this->_password = $password;
@@ -49,8 +49,8 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $password;
         $credentials = array();
-        $credentials["accountid"] = $this->_username;
-        $credentials["apipassword"] = $this->_password;
+        $credentials["user"] = $this->_username;
+        $credentials["password"] = $this->_password;
         $this->_network->login( $credentials );
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
@@ -78,7 +78,6 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
         foreach($merchantList as $merchant) {
-            // TODO
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
@@ -102,60 +101,7 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
 
         // TODO
-        /*
-        $apiKey = '';   // TODO
-
-        $arrVouchers = $this->_network->getVouchers($apiKey);
-
-        foreach($arrVouchers as $obj_voucher) {
-
-            $voucher = str_getcsv($obj_voucher, ',', '"');
-
-            if (count($voucher) < 17) {
-                continue;
-            }
-            $promotionId = $voucher[0];
-            if (!is_numeric($promotionId)) {
-                continue;
-            }
-            $advertiser = $voucher[1];
-            $advertiserId = $voucher[2];
-            $type = $voucher[3];
-            $code = $voucher[4];
-            $description = $voucher[5];
-            $starts = $voucher[6];
-            $ends = $voucher[7];
-            $categories = $voucher[8];
-            $regions = $voucher[9];
-            $terms = $voucher[10];
-            $deeplink_tracking = $voucher[11];
-            $deeplink = $voucher[12];
-            $commission_group = $voucher[13];
-            $commission = $voucher[14];
-            $exclusive = $voucher[15];
-            $date_added = $voucher[16];
-
-            if ($merchantID > 0) {
-                if ($advertiserId != $merchantID) {
-                    continue;
-                }
-            }
-
-            $Deal = Deal::createInstance();
-            $Deal->deal_ID = $promotionId;
-            $Deal->merchant_ID = $advertiserId;
-            $Deal->code = $code;
-            $Deal->description = $description;
-            $Deal->start_date = $Deal->convertDate($starts);
-            $Deal->end_date = $Deal->convertDate($ends);
-            $Deal->default_track_uri = $deeplink_tracking;
-            $Deal->is_exclusive = $exclusive;
-            $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
-            $arrResult[] = $Deal;
-        }
-        */
         $result->deals[]=$arrResult;
-
         return $result;
     }
 
@@ -177,54 +123,22 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
                 foreach ($transactionList as $transaction) {
                     try {
                         $myTransaction = Transaction::createInstance();
-
-                        // TODO
-                        /*
-                        $myTransaction->merchant_ID = $transaction->advertiserId;
-                        $myTransaction->date = $transaction->transactionDate;
-                        if (!empty($transaction->transactionDate)) {
-                            $date = new \DateTime($transaction->transactionDate, new \DateTimeZone('UTC'));
-                            $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
-                        }
-                        $myTransaction->unique_ID = $transaction->id;
-                        if (is_object($transaction->clickRefs)) {
-                            if (property_exists($transaction->clickRefs,'clickRef') && $transaction->clickRefs->clickRef != null && $transaction->clickRefs->clickRef != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
-                            else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null && $transaction->clickRefs->clickRef2 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
-                            else if (property_exists($transaction->clickRefs,'clickRef3') && $transaction->clickRefs->clickRef3 != null && $transaction->clickRefs->clickRef3 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef3;
-                            else if (property_exists($transaction->clickRefs,'clickRef4') && $transaction->clickRefs->clickRef4 != null && $transaction->clickRefs->clickRef4 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef4;
-                            else if (property_exists($transaction->clickRefs,'clickRef5') && $transaction->clickRefs->clickRef5 != null && $transaction->clickRefs->clickRef5 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef5;
-                            else if (property_exists($transaction->clickRefs,'clickRef6') && $transaction->clickRefs->clickRef6 != null && $transaction->clickRefs->clickRef6 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef6;
-                        }
-
-                        $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                        if ($transaction->commissionStatus == 'approved') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
-                        } else if ($transaction->commissionStatus == 'pending') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                        } else if ($transaction->commissionStatus == 'declined') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
-                        }
-                        //echo $transaction->saleAmount->amount."<br>";
-                        $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
-                        $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
-                        $myTransaction->currency = $transaction->commissionAmount->currency;    // 2018-03-26 <PN>
-                        */
+                        $myTransaction->merchant_ID = $transaction['merchantId'];
+                        $myTransaction->unique_ID = $transaction['unique_id'];
+                        $myTransaction->date = $transaction['date'];
+                        $myTransaction->custom_ID = $transaction['custom_id'];
+                        $myTransaction->amount = $transaction['amount'];
+                        $myTransaction->commission = $transaction['commission'];
+                        $myTransaction->currency = $transaction['currency'];
+                        $myTransaction->status = $transaction['status'];
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
-                        //echo "stepE ";
                         echo "<br><br>Transaction Error Impact Radius, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
                         var_dump($e->getTraceAsString());
                     }
                 }
             }
         } catch (\Exception $e) {
-            //echo "stepE ";
             echo "<br><br>Generic Error Impact Radius: ".$e->getMessage()."<br><br>";
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
