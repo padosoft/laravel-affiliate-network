@@ -42,7 +42,11 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
 
     public function login(string $username, string $password): bool
     {
-        $this->_logged = true;
+        if ($this->_username == $username && $this->_password == $password && $this->_network->checkConnection()) {
+            $this->_logged = true;
+            return true;
+        }
+        $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
             return false;
         }
@@ -54,7 +58,6 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $this->_network->login( $credentials );
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
-
         }
         return $this->_logged;
     }
@@ -100,7 +103,53 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $result = DealsResultset::createInstance();
         $arrResult = array();
 
-        // TODO
+        $dealsList = $this->_network->getDeals();
+        foreach($dealsList as $dealItem) {
+
+            $Deal = Deal::createInstance();
+            $Deal->deal_ID = $dealItem['id'];
+            $Deal->merchant_ID = $dealItem['campaign_id'];
+            $Deal->code = $dealItem['promo_code'];
+            $Deal->description = $dealItem['description'];
+            $Deal->start_date = $Deal->convertDate($dealItem['start_date']);
+            $Deal->end_date = $Deal->convertDate($dealItem['end_date']);
+            $Deal->default_track_uri = $dealItem['url'];
+            switch ($dealItem['type']) {
+                case 'GENERAL_SALE':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    break;
+                case 'FREE_SHIPPING':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_SHIPPING;
+                    break;
+                case 'GIFT_WITH_PURCHASE':
+                case 'BOGO': // Buy One Get One
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_FREE_ARTICLE;
+                    break;
+                case 'REBATE':
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                    break;
+                default:
+                    echo "Impact Radius - Deal id " . $dealItem['id'] . " Program " . $dealItem['campaign_name'] . " - Unexpected Deal type:" . $dealItem['type'] ."<br>";
+                    break;
+            }
+            if ($dealItem['discount_type'] == 'PERCENT') {
+                $Deal->is_percentage = true;
+                $Deal->discount_amount = $dealItem['discount_percent'];
+                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+            } elseif ($dealItem['discount_type'] == 'PERCENT_RANGE') {
+                $Deal->is_percentage = true;
+                $Deal->discount_amount = $dealItem['discount_percent_range_max'];
+                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+            }
+            else {
+                echo "Impact Radius - Deal id " . $dealItem['id'] . " Program " . $dealItem['campaign_name'] . " - Unhandled Discount type:" . $dealItem['discount_type'] ." <br>\n";
+                $Deal->is_percentage = false;
+                $Deal->amount = $dealItem['discount_amount'];
+            }
+            $Deal->minimum_order_value = $dealItem['minimum_purchase'];
+
+            $arrResult[] = $Deal;
+        }
         $result->deals[]=$arrResult;
         return $result;
     }
@@ -123,9 +172,10 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
                 foreach ($transactionList as $transaction) {
                     try {
                         $myTransaction = Transaction::createInstance();
-                        $myTransaction->merchant_ID = $transaction['merchantId'];
                         $myTransaction->unique_ID = $transaction['unique_id'];
+                        $myTransaction->merchant_ID = $transaction['merchant_id'];
                         $myTransaction->date = $transaction['date'];
+                        $myTransaction->date_click = $transaction['date_click'];
                         $myTransaction->custom_ID = $transaction['custom_id'];
                         $myTransaction->amount = $transaction['amount'];
                         $myTransaction->commission = $transaction['commission'];
