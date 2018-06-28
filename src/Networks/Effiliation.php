@@ -74,22 +74,23 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
         echo "effiliation getMerchant url ",PHP_EOL;
         $content = @\file_get_contents($url);
         $xml = \simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
-        foreach ($xml->program as $merchant) {
-            $Merchant = Merchant::createInstance();
-            $Merchant->merchant_ID = (string)$merchant->id_programme;
-            $Merchant->name = (string)$merchant->nom;
-            // Added more info - 2018-04-23 <PN>
-            $Merchant->launch_date = (string)$merchant->date_debut;
-            $Merchant->termination_date = (string)$merchant->date_fin;
-            $Merchant->status = (string)$merchant->etat;
-            if (empty($Merchant->status)) {
-                // Empty means "not applied"
-                $Merchant->status = 'not-applied';
+        if ($xml !== false) {
+            foreach ($xml->program as $merchant) {
+                $Merchant = Merchant::createInstance();
+                $Merchant->merchant_ID = (string)$merchant->id_programme;
+                $Merchant->name = (string)$merchant->nom;
+                // Added more info - 2018-04-23 <PN>
+                $Merchant->launch_date = (string)$merchant->date_debut;
+                $Merchant->termination_date = (string)$merchant->date_fin;
+                $Merchant->status = (string)$merchant->etat;
+                if (empty($Merchant->status)) {
+                    // Empty means "not applied"
+                    $Merchant->status = 'not-applied';
+                }
+                $Merchant->url = (string)$merchant->url;
+                $arrResult[] = $Merchant;
             }
-            $Merchant->url = (string)$merchant->url;
-            $arrResult[] = $Merchant;
         }
-
         return $arrResult;
     }
 
