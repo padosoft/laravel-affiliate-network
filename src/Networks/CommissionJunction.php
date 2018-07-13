@@ -227,13 +227,16 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Transaction->amount = $transaction['amount'];
             $Transaction->custom_ID = $transaction['custom_id'];
             $Transaction->unique_ID = $transaction['unique_id'];
-            $Transaction->transaction_ID = $transaction['order-id'];
+            // Use 'original-action-id' instead of 'order-id' as reference field between original commission and adjust/correction commission - 2018-07-13 <PN>
+            // $Transaction->transaction_ID = $transaction['order-id'];
+            $Transaction->transaction_ID = $transaction['original-action-id'];
             $Transaction->commission = $transaction['commission'];
             if (!empty($transaction['date'])) {
                 $date = new \DateTime($transaction['date']);
                 $Transaction->date = $date; // $date->format('Y-m-d H:i:s');
             }
             $Transaction->merchant_ID = $transaction['merchantId'];
+            $Transaction->original = $transaction['original'];
             //original	Displays either a '1' indicating an original transaction or a '0' indicating a non-original or correction transaction.
             // considero transazioni valide solo quelle di tipo original come viene fatto dal report consultabile sul sito web di c.j.
             // Don't check for 'original' to get DECLINED transactions - 2017-12-13 <PN>

@@ -118,6 +118,10 @@ class Transaction
      */
     public $user_ID = '';   // Future use - <PN>
 
+    /**
+     * @var bool
+     */
+    public $original = true;    // Used by Commission Junction - added 2018-07-13 <PN>
 
     /**
      * @method createInstance
