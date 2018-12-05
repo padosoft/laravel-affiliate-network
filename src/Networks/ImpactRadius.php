@@ -177,7 +177,12 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date;
                         $myTransaction->date_click = $transaction['date_click'];
-                        $myTransaction->custom_ID = $transaction['custom_id'];
+                        if (isset($transaction['custom_id'])) {
+                            $myTransaction->custom_ID = $transaction['custom_id'];
+                        }
+                        else {
+                            $myTransaction->custom_ID = null;
+                        }
                         $myTransaction->amount = $transaction['amount'];
                         $myTransaction->commission = $transaction['commission'];
                         $myTransaction->currency = $transaction['currency'];
