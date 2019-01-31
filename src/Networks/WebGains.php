@@ -154,23 +154,26 @@ class WebGains extends AbstractNetwork implements NetworkInterface
         return $result;
     }
 
-    /**
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param int $merchantID
-     * @return array of Transaction
-     */
+   /**
+	 * @param \DateTime $dateFrom
+	 * @param \DateTime $dateTo
+	 * @param array $arrMerchantID
+	 * @return array of Transaction
+	 * @throws \Exception
+	 */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
-        if (count( $arrMerchantID ) < 1) {
+        /*
+    	if (count( $arrMerchantID ) < 1) {
             $merchants = $this->getMerchants();
             foreach ($merchants as $merchant) {
                 $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
             }
         }
-        $arrResult = array();
-        $transcationList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
-        foreach($transcationList as $transaction) {
+        */
+	    $arrResult = array();
+        $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+        foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->currency = $transaction['currency'];
             $Transaction->status = $transaction['status'];
