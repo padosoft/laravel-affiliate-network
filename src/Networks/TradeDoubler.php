@@ -28,22 +28,27 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
     private $_apiClient = null;
     private $_username = '';
     private $_password = '';
+    private $_idSite = '';
     private $_logged    = false;
     protected $_tracking_parameter    = 'epi';
 
     /**
-     * @method __construct
-     */
-    public function __construct(string $username, string $password,string $idSite='')
+	 * TradeDoubler constructor.
+	 * @param string $username
+	 * @param string $password
+	 * @param string $idSite
+	 */
+    public function __construct(string $username, string $password, string $idSite = '')
     {
         $this->_network = new TradeDoublerEx;
         $this->_username = $username;
         $this->_password = $password;
+	    $this->_idSite = $idSite;
         $this->_apiClient = null;
         $this->login( $this->_username, $this->_password );
     }
 
-    public function login(string $username, string $password,string $idSite=''): bool
+    public function login(string $username, string $password, string $idSite = ''): bool
     {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
@@ -52,9 +57,11 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
         }
         $this->_username = $username;
         $this->_password = $password;
+        $this->_idSite = $idSite;
         $credentials = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
+        $credentials["idSite"] = $this->_idSite;
         $this->_network->login( $credentials );
 
         if ($this->_network->checkConnection()) {

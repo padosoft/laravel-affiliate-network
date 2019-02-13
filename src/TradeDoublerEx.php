@@ -126,7 +126,6 @@ class TradeDoublerEx extends TradeDoublerOara
             new \Oara\Curl\Parameter('metric1.midOperator', '/'),
             new \Oara\Curl\Parameter('dateSelectionType', $byDateUpdated ? '2' : '1'),    // Retrieve transactions by Date Event (default = 1) or by Date Last Updated (2)
             new \Oara\Curl\Parameter('favoriteName', ''),
-            new \Oara\Curl\Parameter('affiliateId', ''),
             new \Oara\Curl\Parameter('dateType', '1'),
             new \Oara\Curl\Parameter('period', 'custom_period'),
             new \Oara\Curl\Parameter('tabMenuName', ''),
@@ -142,6 +141,12 @@ class TradeDoublerEx extends TradeDoublerOara
         );
         $valuesFormExport[] = new \Oara\Curl\Parameter('startDate', self::formatDate($dStartDate));
         $valuesFormExport[] = new \Oara\Curl\Parameter('endDate', self::formatDate($dEndDate));
+        if (!empty($this->_credentials['idSite'])){
+	        $valuesFormExport[] = new \Oara\Curl\Parameter('affiliateId', $this->_credentials['idSite']);
+        }
+        else{
+	        $valuesFormExport[] = new \Oara\Curl\Parameter('affiliateId', '');
+        }
         $urls = array();
         $urls[] = new \Oara\Curl\Request('http://publisher.tradedoubler.com/pan/aReport3Internal.action?', $valuesFormExport);
         $exportReport = $this->_client->get($urls);
