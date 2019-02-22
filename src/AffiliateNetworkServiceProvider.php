@@ -34,8 +34,7 @@ class AffiliateNetworkServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
-        $this->app['NetworkManager']=$this->app->share(function ($app) {
+        $this->app->singleton(Connection::class, function ($app) {
             return new NetworkManager();
         });
         $this->app->alias('NetworkManager', NetworkManager::class);
