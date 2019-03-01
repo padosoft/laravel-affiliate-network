@@ -189,52 +189,25 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
                 //echo "stepC ";
                 foreach ($transactionList as $transaction) {
                     try {
-/*
-                        var_dump(json_encode($transaction));
-                        echo "<br><br><br><br>";
-*/
                         $myTransaction = Transaction::createInstance();
 
-                        $myTransaction->merchant_ID = $transaction->advertiserId;
-                        $myTransaction->date = $transaction->transactionDate;
-                        //echo $transaction->transactionDate."<br>";
-                        if (!empty($transaction->transactionDate)) {
-                            $date = new \DateTime($transaction->transactionDate, new \DateTimeZone('UTC'));
-                            $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
-                            //var_dump($date);
+                        $myTransaction->merchant_ID = $transaction['merchantId'];
+                        $myTransaction->date = $transaction['date'];
+                        if (!empty($transaction['date'])) {
+                            $date = new \DateTime($transaction['date'], new \DateTimeZone('UTC'));
+                            $myTransaction->date = $date;
                         }
-                        $myTransaction->unique_ID = $transaction->id;
-                        if (is_object($transaction->clickRefs)) {
-                            if (property_exists($transaction->clickRefs,'clickRef') && $transaction->clickRefs->clickRef != null && $transaction->clickRefs->clickRef != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef;
-                            else if (property_exists($transaction->clickRefs,'clickRef2') && $transaction->clickRefs->clickRef2 != null && $transaction->clickRefs->clickRef2 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef2;
-                            else if (property_exists($transaction->clickRefs,'clickRef3') && $transaction->clickRefs->clickRef3 != null && $transaction->clickRefs->clickRef3 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef3;
-                            else if (property_exists($transaction->clickRefs,'clickRef4') && $transaction->clickRefs->clickRef4 != null && $transaction->clickRefs->clickRef4 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef4;
-                            else if (property_exists($transaction->clickRefs,'clickRef5') && $transaction->clickRefs->clickRef5 != null && $transaction->clickRefs->clickRef5 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef5;
-                            else if (property_exists($transaction->clickRefs,'clickRef6') && $transaction->clickRefs->clickRef6 != null && $transaction->clickRefs->clickRef6 != 0)
-                                $myTransaction->custom_ID = $transaction->clickRefs->clickRef6;
-                        }
+                        $myTransaction->unique_ID = $transaction['unique_id'];
+                        $myTransaction->custom_ID = $transaction['custom_id'];
+                        $myTransaction->status = $transaction['status'];
+                        $myTransaction->amount = $transaction['amount'];
+                        $myTransaction->commission = $transaction['commission'];
+                        $myTransaction->currency = $transaction['currency'];
 
-                        $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                        if ($transaction->commissionStatus == 'approved') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_CONFIRMED;
-                        } else if ($transaction->commissionStatus == 'pending') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_PENDING;
-                        } else if ($transaction->commissionStatus == 'declined') {
-                            $myTransaction->status = \Oara\Utilities::STATUS_DECLINED;
-                        }
-                        //echo $transaction->saleAmount->amount."<br>";
-                        $myTransaction->amount = \Oara\Utilities::parseDouble($transaction->saleAmount->amount);
-                        $myTransaction->commission = \Oara\Utilities::parseDouble($transaction->commissionAmount->amount);
-                        $myTransaction->currency = $transaction->commissionAmount->currency;    // 2018-03-26 <PN>
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
                         //echo "stepE ";
-                        echo "<br><br>Transaction Error AffiliateWindow, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                        echo "<br><br>Transaction Error AffiliateWindow, id: ".$transaction['unique_id']." msg: ".$e->getMessage()."<br><br>";
                         var_dump($e->getTraceAsString());
                         //throw new \Exception($e);
                     }

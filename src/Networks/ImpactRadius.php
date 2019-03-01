@@ -53,8 +53,14 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $password;
         $credentials = array();
-        $credentials["user"] = $this->_username;
-        $credentials["password"] = $this->_password;
+        // Old
+        // $credentials["user"] = $this->_username;
+        // $credentials["password"] = $this->_password;
+        // New - need sid/token pair to access API directly ...
+        // ... Login simulation using username/password no longer works due to a new browser js challenge script - 2019-03-01 <PN>
+        $credentials["api-sid"] = $this->_username;
+        $credentials["api-token"] = $this->_password;
+
         $this->_network->login( $credentials );
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
