@@ -117,7 +117,7 @@ class NetworkManager
      *
      * @return array of Transaction
      */
-    public function getSales(string $network_alias,\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
+    public function getSales(string $network_alias, \DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()): array
     {
         if (!$this->hasNetwork($network_alias)) {
             return [];
@@ -132,7 +132,7 @@ class NetworkManager
      *
      * @return array of Stat
      */
-    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0): array
+    public function getStats(string $network_alias, \DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0): array
     {
         if (!$this->hasNetwork($network_alias)) {
             return [];
