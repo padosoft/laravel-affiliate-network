@@ -42,7 +42,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
 
     public function login(string $username, string $password): bool
     {
-        $this->_logged = true;
+        $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
             return false;
         }
