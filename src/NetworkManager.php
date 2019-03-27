@@ -77,10 +77,18 @@ class NetworkManager
         return $this->avaliable_networks;
     }
 
-    public function hasNetwork($network_alias){
+    /**
+     * @param $network_alias
+     * @param string $username
+     * @param string $password
+     * @param string $id_site
+     * @param string $country
+     * @return bool
+     */
+    public function hasNetwork($network_alias, $username = '', $password = '', string $id_site = '', string $country = '') {
         if (!array_key_exists($network_alias, $this->networks ) && array_key_exists($network_alias, $this->avaliable_networks)){
             $fully_className=$this->avaliable_networks[$network_alias];
-            $this->networks[$network_alias]= new $fully_className('','');
+            $this->networks[$network_alias]= new $fully_className($username, $password, $id_site, $country);
         }
         return array_key_exists($network_alias, $this->networks );
     }
@@ -145,11 +153,15 @@ class NetworkManager
         }
         return $this->networks[$network_alias]->checkLogin();
     }
-    public function login(string $network_alias,string $username, string $password,string $idSite='', string $country = ''): bool{
-        if (!$this->hasNetwork($network_alias)) {
+
+    public function login(string $network_alias, string $username, string $password, string $id_site = '', string $country = ''): bool{
+        if (!$this->hasNetwork($network_alias, $username, $password, $id_site, $country)) {
             return false;
         }
-        return $this->networks[$network_alias]->login($username,$password,$idSite, $country);
+        if (!$this->networks[$network_alias]->checkLogin()) {
+            return $this->networks[$network_alias]->login($username, $password, $id_site, $country);
+        }
+        return true;
     }
 
     public function getTrackingParameter(string $network_alias):string {
