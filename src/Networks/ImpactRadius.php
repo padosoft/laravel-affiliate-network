@@ -138,7 +138,7 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
                     echo "Impact Radius - Deal id " . $dealItem['id'] . " Program " . $dealItem['campaign_name'] . " - Unexpected Deal type:" . $dealItem['type'] ."<br>";
                     break;
             }
-            if ($dealItem['discount_type'] == 'PERCENT') {
+            if ($dealItem['discount_type'] == 'PERCENT' || $dealItem['discount_type'] == 'PERCENT_MAXIMUM') {
                 $Deal->is_percentage = true;
                 $Deal->discount_amount = $dealItem['discount_percent'];
                 $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
@@ -146,11 +146,17 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
                 $Deal->is_percentage = true;
                 $Deal->discount_amount = $dealItem['discount_percent_range_max'];
                 $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+            } elseif ($dealItem['discount_type'] == 'FIXED') {
+                $Deal->is_percentage = false;
+                $Deal->discount_amount = $dealItem['discount_amount'];
+                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
             }
             else {
-                echo "Impact Radius - Deal id " . $dealItem['id'] . " Program " . $dealItem['campaign_name'] . " - Unhandled Discount type:" . $dealItem['discount_type'] ." <br>\n";
-                $Deal->is_percentage = false;
-                $Deal->amount = $dealItem['discount_amount'];
+                if ($dealItem['status'] != 'EXPIRED') {
+                    echo "Impact Radius - Deal id " . $dealItem['id'] . " Program " . $dealItem['campaign_name'] . " - Unhandled Discount type:" . $dealItem['discount_type'] . PHP_EOL;
+                    $Deal->is_percentage = false;
+                    $Deal->amount = $dealItem['discount_amount'];
+                }
             }
             $Deal->minimum_order_value = $dealItem['minimum_purchase'];
 
@@ -159,7 +165,7 @@ class ImpactRadius extends AbstractNetwork implements NetworkInterface
         $result->deals[]=$arrResult;
         return $result;
     }
-
+    
     /**
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
