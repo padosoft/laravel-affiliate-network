@@ -30,16 +30,16 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password, string $idSite='')
+    public function __construct(string $username, string $password, string $idSite = '')
     {
         $this->_network = new \Oara\Network\Publisher\LinkShare;
         $this->_username = $username;
         $this->_password = $password;
-        $idSite = $this->_idSite;
+        $this->_idSite = $idSite;
 
         $this->login( $this->_username, $this->_password, $idSite );
     }
-
+    
     public function login(string $username, string $password,string $idSite=''): bool{
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
