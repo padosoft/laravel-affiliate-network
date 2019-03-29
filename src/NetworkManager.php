@@ -3,6 +3,9 @@
 namespace Padosoft\AffiliateNetwork;
 
 use Padosoft\AffiliateNetwork\DealsResultset;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
 
 /**
  * Class NetworkManager
@@ -16,14 +19,63 @@ class NetworkManager
      */
     protected $networks = [];
     protected $avaliable_networks = [];
+    protected $loggerService = null;
 
     /**
      * Register the dependencies
      */
     public function __construct()
     {
-        //$this->setNetwork($network);
         $this->loadAvailableNetworks();
+    }
+
+    public function logCapture()
+    {
+        if (!is_null($this->loggerService)) {
+            if (ob_get_contents() != '') {
+                // flush any pending log
+                $this->logFlush();
+            }
+            // Initialize output capture
+            ob_start();
+        }
+    }
+
+    /**
+     * Flush the captured log messages
+     */
+    public function logFlush()
+    {
+        if (!is_null($this->loggerService)) {
+            $messages = @ob_get_flush();
+            $messages = str_replace('<BR>',PHP_EOL, $messages);
+            $a_messages = explode(PHP_EOL, $messages);
+            foreach ($a_messages as $message) {
+                if (!empty(trim($message))) {
+                    if (strpos(strtolower($message), 'error') !== false) {
+                        $this->loggerService->error($message);
+                    }
+                    elseif (strpos(strtolower($message), 'warning') !== false) {
+                        $this->loggerService->warning($message);
+                    }
+                    elseif (strpos(strtolower($message), 'debug') !== false) {
+                        $this->loggerService->debug($message);
+                    }
+                    else {
+                        $this->loggerService->info($message);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Inject an external Log service compatible with Psr\Log interface
+     * @param Psr\Log\LoggerInterface $loggerService
+     */
+    public function setLogger(\Psr\Log\LoggerInterface $loggerService)
+    {
+        $this->loggerService = $loggerService;
     }
 
     /**
@@ -67,8 +119,6 @@ class NetworkManager
                 continue;
             }
             $class = new \ReflectionClass(__NAMESPACE__.'\\Networks\\'.substr($network_class,0,-4));
-
-
             $this->avaliable_networks[$class->getShortName()]=$class->getName();
         }
     }
@@ -107,7 +157,10 @@ class NetworkManager
         if (!isIntegerPositive($merchantID)){
             $merchantID=NULL;
         }
-        return $this->networks[$network_alias]->getDeals( $merchantID, $page, $items_per_page );
+        $this->logCapture();
+        $a_deals = $this->networks[$network_alias]->getDeals( $merchantID, $page, $items_per_page );
+        $this->logFlush();
+        return $a_deals;
     }
 
     /**
@@ -122,7 +175,10 @@ class NetworkManager
         if (!$this->hasNetwork($network_alias)) {
             return [];
         }
-        return $this->networks[$network_alias]->getSales( $dateFrom, $dateTo, $arrMerchantID );
+        $this->logCapture();
+        $a_sales = $this->networks[$network_alias]->getSales( $dateFrom, $dateTo, $arrMerchantID );
+        $this->logFlush();
+        return $a_sales;
     }
 
     /**
@@ -144,14 +200,21 @@ class NetworkManager
         if (!$this->hasNetwork($network_alias)) {
             return [];
         }
-        return $this->networks[$network_alias]->getMerchants();
+        $this->logCapture();
+        $a_merchants = $this->networks[$network_alias]->getMerchants();
+        $this->logFlush();
+        return $a_merchants;
+
     }
 
     public function checkLogin(string $network_alias): bool{
         if (!$this->hasNetwork($network_alias)) {
             return false;
         }
-        return $this->networks[$network_alias]->checkLogin();
+        $this->logCapture();
+        $success = $this->networks[$network_alias]->checkLogin();
+        $this->logFlush();
+        return $success;
     }
 
     public function login(string $network_alias, string $username, string $password, string $id_site = '', string $country = ''): bool{
@@ -159,7 +222,10 @@ class NetworkManager
             return false;
         }
         if (!$this->networks[$network_alias]->checkLogin()) {
-            return $this->networks[$network_alias]->login($username, $password, $id_site, $country);
+            $this->logCapture();
+            $success = $this->networks[$network_alias]->login($username, $password, $id_site, $country);
+            $this->logFlush();
+            return $success;
         }
         return true;
     }
