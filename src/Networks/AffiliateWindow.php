@@ -215,10 +215,16 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
             }
             //echo "stepD ";
         } catch (\Exception $e) {
-            //echo "stepE ";
-            echo "<br><br>Generic Error AffiliateWindow: ".$e->getMessage()."<br><br>";
-            var_dump($e->getTraceAsString());
-            throw new \Exception($e);
+            $message = $e->getMessage();
+            if (strpos($message, '429') !== false) {
+                echo "[AffiliateWindow][Error] 429 Too Many Requests" . PHP_EOL;
+                throw new \Exception("Too many requests", 429 );
+            }
+            else {
+                echo "[AffiliateWindow][Error] " . $e->getMessage() . PHP_EOL;
+                var_dump($e->getTraceAsString());
+                throw new \Exception($e);
+            }
         }
         return $arrResult;
     }
@@ -231,7 +237,7 @@ class AffiliateWindow extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
-        return array();        
+        return array();
     }
 
 
