@@ -35,7 +35,7 @@ class Admitad extends AbstractNetwork implements NetworkInterface
         $this->_network = new \Oara\Network\Publisher\Admitad;
         $this->_username = $username;
         $this->_password = $password;
-        $idSite = $this->_idSite;
+        $this->_idSite = $idSite;
 
         $this->login( $this->_username, $this->_password, $idSite );
     }
