@@ -56,9 +56,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
-
         }
-
         return $this->_logged;
     }
 
@@ -67,7 +65,6 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        $this->_logged = true;
         return $this->_logged;
     }
 
