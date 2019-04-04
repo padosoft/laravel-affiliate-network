@@ -18,7 +18,16 @@ class AffilinetEx extends AffilinetOara
 
         // Don't need merchant list here
         // $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $now = new \DateTime();
 
+        if ($dEndDate->format('Y-m-d') == $now->format('Y-m-d')) {
+            // Ends Today ... set current hour
+            $dEndDate->setTime($now->format('h'), 0,0);
+        }
+        else {
+            // End date in the past
+            $dEndDate->setTime(23,59,59);
+        }
 
         if (isset($_ENV['AFFILINET_CURRENCY'])) {
             // 2018-04-16 - <PN>
@@ -37,8 +46,8 @@ class AffilinetEx extends AffilinetOara
             // Handle two steps: 1^ to get registered transactions / 2^ to get confirmed or cancelled transactions - <PN> 2017-06-27
             while ($step++ <= 2) {
                 $params = array(
-                    'StartDate' => \strtotime($dStartDate->format("Y-m-d")),
-                    'EndDate' => \strtotime($dEndDate->format("Y-m-d")),
+                    'StartDate' => \strtotime($dStartDate->format("Y-m-d 00:00:00")),
+                    'EndDate' => \strtotime($dEndDate->format("Y-m-d h:i:s")),
                     'TransactionStatus' => 'All',
                     'ValuationType' => $step == 1 ? 'DateOfRegistration' : 'DateOfConfirmation'
                 );
@@ -54,28 +63,28 @@ class AffilinetEx extends AffilinetOara
                     }
 
                     foreach ($transactionCollection as $transactionObject) {
-
-                        $transaction = array();
-                        $transaction["status"] = $transactionObject->TransactionStatus;
-                        $transaction["unique_id"] = $transactionObject->TransactionId;
-                        $transaction["commission"] = $transactionObject->PublisherCommission;
-                        $transaction["currency"] = $currency;   // 2018-04-16 - <PN>
-                        $transaction["amount"] = $transactionObject->NetPrice;
-                        $transaction["date"] = $transactionObject->RegistrationDate;
-                        $transaction["click_date"] = $transactionObject->ClickDate;         // Future use - <PN>
-                        $transaction["udpate_date"] = $transactionObject->CheckDate;        // Future use - <PN>
-                        $transaction["merchantId"] = $transactionObject->ProgramId;
-                        $transaction["custom_id"] = $transactionObject->SubId;
-                        if ($transaction['status'] == 'Confirmed') {
-                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                        } else
-                            if ($transaction['status'] == 'Open') {
+                        $uniqueId = $transactionObject->TransactionId;
+                        if (!isset($totalTransactions[$uniqueId])) {
+                            $transaction = array();
+                            $transaction["status"] = $transactionObject->TransactionStatus;
+                            $transaction["unique_id"] = $transactionObject->TransactionId;
+                            $transaction["commission"] = $transactionObject->PublisherCommission;
+                            $transaction["currency"] = $currency;   // 2018-04-16 - <PN>
+                            $transaction["amount"] = $transactionObject->NetPrice;
+                            $transaction["date"] = $transactionObject->RegistrationDate;
+                            $transaction["click_date"] = $transactionObject->ClickDate;         // Future use - <PN>
+                            $transaction["udpate_date"] = $transactionObject->CheckDate;        // Future use - <PN>
+                            $transaction["merchantId"] = $transactionObject->ProgramId;
+                            $transaction["custom_id"] = $transactionObject->SubId;
+                            if ($transaction['status'] == 'Confirmed') {
+                                $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                            } elseif ($transaction['status'] == 'Open') {
                                 $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                            } else
-                                if ($transaction['status'] == 'Cancelled') {
-                                    $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                                }
-                        $totalTransactions[] = $transaction;
+                            } elseif ($transaction['status'] == 'Cancelled') {
+                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                            }
+                            $totalTransactions[$uniqueId] = $transaction;
+                        }
                     }
                     $currentPage++;
                     $transactionList = self::affilinetCall('transaction', $publisherStatisticsService, $params, 0, $currentPage);
