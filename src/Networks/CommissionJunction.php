@@ -33,13 +33,13 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $passwordApi, string $idSite='')
+    public function __construct(string $username, string $passwordApi, $idSite)
     {
-        $this->_network = new \Oara\Network\Publisher\CommissionJunction;
+        $this->_network = new \Oara\Network\Publisher\CommissionJunctionGraphQL();
         $this->_username = $username;
         $this->_password = $passwordApi;
         $this->_passwordApi = $passwordApi;
-        $idSite = $this->_website_id;
+        $this->_website_id = $idSite;
 
         if (trim($idSite)!=''){
             $this->addAllowedSite($idSite);
@@ -51,7 +51,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @return bool
      */
-    public function login(string $username, string $password,string $idSite=''): bool
+    public function login(string $username, string $password, $idSite): bool
     {
         $this->_logged = false;
         if (isNullOrEmpty( $username ) && isNullOrEmpty( $password )) {
