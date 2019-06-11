@@ -44,10 +44,10 @@ class WebGains extends AbstractNetwork implements NetworkInterface
                 'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
                 'soap_version' => SOAP_1_1)
         );
-        $this->login( $this->_username, $this->_password );
+        $this->login( $this->_username, $this->_password, $this->_idSite);
     }
 
-    public function login(string $username, string $password,string $idSite=''): bool{
+    public function login(string $username, string $password, string $idSite = ''): bool{
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
 
