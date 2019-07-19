@@ -295,22 +295,29 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         throw new \Exception("Not implemented yet");
     }
 
-    /**
-     * Api call CommissionJunction
-     */
-    private function _apiCall($url)
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_passwordApi));
-        $curl_results = curl_exec($ch);
-        curl_close($ch);
-        return $curl_results;
-    }
+	/**
+	 * Api call CommissionJunction
+	 */
+	private function _apiCall($url)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_POST, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		if (!empty($this->_publisher_id)) {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_passwordApi));
+		}
+		else {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_passwordApi));
+		}
+
+		$curl_results = curl_exec($ch);
+		curl_close($ch);
+		return $curl_results;
+	}
+
 
     public function getTrackingParameter()
     {
