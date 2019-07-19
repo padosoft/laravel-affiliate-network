@@ -81,6 +81,7 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
             $Merchant->name = $merchant['name'];
             $Merchant->status = $merchant['status'];
             $Merchant->termination_date = $merchant['termination_date'];
+            $Merchant->url = $merchant['url'];
             $arrResult[] = $Merchant;
         }
         return $arrResult;
