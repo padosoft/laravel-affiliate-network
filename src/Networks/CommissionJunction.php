@@ -27,7 +27,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     private $_username = '';
     private $_password = '';
     private $_passwordApi = '';
-    private $_website_id = '';
+    private $_publisher_id = '';
     protected $_tracking_parameter = 'sid';
 
     /**
@@ -39,13 +39,13 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $passwordApi;
         $this->_passwordApi = $passwordApi;
-        $this->_website_id = $idSite;
+        $this->_publisher_id = $idSite;
 
         if (trim($idSite)!=''){
             $this->addAllowedSite($idSite);
         }
 
-        $this->login( $this->_username, $this->_password ,$this->_website_id);
+        $this->login( $this->_username, $this->_password ,$this->_publisher_id);
     }
 
     /**
@@ -60,7 +60,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_username = $username;
         $this->_password = $password;
         $this->_passwordApi= $password;
-        $this->_website_id = $idSite;
+        $this->_publisher_id = $idSite;
         $credentials = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_username;
@@ -121,6 +121,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      * @param int $page
      * @param int $records_per_page
      * @return DealsResultset array of Deal
+     * https://developers.cj.com/docs/rest-apis/link-search
      */
     public function getDeals($merchantID = NULL, int $page = 1, int $records_per_page = 100): DealsResultset
     {
@@ -141,16 +142,20 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             try {
                 //<JC> 2017-10-23  (valid keys are: advertiser-ids, category, event-name, keywords, language, link-type, page-number, promotion-end-date, promotion-start-date, promotion-type, records-per-page, website-id)
                 $response = $this->_apiCall(
-                    'https://link-search.api.cj.com/v2/link-search?website-id=' . $this->_website_id .
+                    'https://link-search.api.cj.com/v2/link-search?website-id=' . $_ENV['CJ_API_WEBSITE_ID'] .
                     '&advertiser-ids=' . $merchantID .
                     '&records-per-page=' . $records_per_page .
                     '&page-number=' . $page .
                     '&promotion-type=coupon'
                 );
 
-                if ($response===false || \preg_match("/error/", $response)) {
-                    return $arrResult;
-                }
+	            if ($response === false || \preg_match("/error/", $response)) {
+		            preg_match('/<error-message>(.*)<\/error-message>/', $response, $matches);
+		            $error_msg = $matches[1] ?? $response;
+		            echo "[CommissionJunction][Error] " . $error_msg . PHP_EOL;
+		            var_dump($error_msg);
+		            throw new \Exception($error_msg);
+	            }
 
                 $arrResponse = xml2array($response);
 
@@ -193,7 +198,9 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
                 $page++;
             }
             catch (\Exception $e){
-                return $arrResult;
+	            echo "[CommissionJunction][Error] " . $e->getMessage() . PHP_EOL;
+	            var_dump($e->getTraceAsString());
+	            throw new \Exception($e);
             }
         }
 
