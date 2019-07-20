@@ -22,7 +22,7 @@
         "illuminate/support": "^5.0",
         "padosoft/support": "^1.12",
         "vlucas/phpdotenv": "^2.4",
-        "padosoft/php-oara": "^2.1.7",
+        "padosoft/php-oara": "~2.0",
         "psr/log": "^1.1"
     },
     "require-dev": {
