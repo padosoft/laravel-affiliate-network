@@ -135,6 +135,9 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
 
         $arrItems = $arrResponse['listing']['item'];
         foreach($arrItems as $item) {
+            if (!isset($item['idcamp'])){
+                continue;
+            }
             $Deal = Deal::createInstance();
             $Deal->merchant_ID = $item['idcamp'];
             $Deal->code = $item['code'];
