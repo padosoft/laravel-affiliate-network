@@ -41,11 +41,11 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $this->_passwordApi = $passwordApi;
         $this->_publisher_id = $idSite;
 
-        if (trim($idSite)!=''){
+        if (trim($idSite) != '') {
             $this->addAllowedSite($idSite);
         }
 
-        $this->login( $this->_username, $this->_password ,$this->_publisher_id);
+        $this->login($this->_username, $this->_password, $this->_publisher_id);
     }
 
     /**
@@ -54,12 +54,12 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     public function login(string $username, string $password, $idSite): bool
     {
         $this->_logged = false;
-        if (isNullOrEmpty( $username ) && isNullOrEmpty( $password )) {
+        if (isNullOrEmpty($username) && isNullOrEmpty($password)) {
             return false;
         }
         $this->_username = $username;
         $this->_password = $password;
-        $this->_passwordApi= $password;
+        $this->_passwordApi = $password;
         $this->_publisher_id = $idSite;
         $credentials = array();
         $credentials["user"] = $this->_username;
@@ -67,7 +67,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         $credentials["apipassword"] = $this->_passwordApi;
         $credentials["id_site"] = $idSite;
 
-        if (trim($idSite)!=''){
+        if (trim($idSite) != '') {
             $this->addAllowedSite($idSite);
         }
 
@@ -82,7 +82,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     /**
      * @return bool
      */
-    public function checkLogin() : bool
+    public function checkLogin(): bool
     {
         return $this->_logged;
     }
@@ -106,8 +106,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             $Merchant->url = $merchant['url'];
             if ($merchant['status'] == 'Active') {
                 $Merchant->status = $merchant['relationship_status'];
-            }
-            else {
+            } else {
                 $Merchant->status = $merchant['status'];
             }
             $arrResult[] = $Merchant;
@@ -125,19 +124,19 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID = NULL, int $page = 1, int $records_per_page = 100): DealsResultset
     {
-        if (empty($page)){
+        if (empty($page)) {
             $page = 1;
         }
-        if (empty($records_per_page)){
+        if (empty($records_per_page)) {
             $records_per_page = 100;
         }
-        if (empty($merchantID)){
-            $merchantID  = 'joined';
+        if (empty($merchantID)) {
+            $merchantID = 'joined';
         }
         $arrResult = new DealsResultset();
         $arrResult->items = $records_per_page;
 
-        while ((int) $arrResult->items >= (int) $records_per_page){
+        while ((int)$arrResult->items >= (int)$records_per_page) {
 
             try {
                 //<JC> 2017-10-23  (valid keys are: advertiser-ids, category, event-name, keywords, language, link-type, page-number, promotion-end-date, promotion-start-date, promotion-type, records-per-page, website-id)
@@ -149,29 +148,35 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
                     '&promotion-type=coupon'
                 );
 
-	            if ($response === false || \preg_match("/error/", $response)) {
-		            preg_match('/<error-message>(.*)<\/error-message>/', $response, $matches);
-		            $error_msg = $matches[1] ?? $response;
-		            echo "[CommissionJunction][Error] " . $error_msg . PHP_EOL;
-		            var_dump($error_msg);
-		            throw new \Exception($error_msg);
-	            }
+                if ($response === false || \preg_match("/error/", $response)) {
+                    preg_match('/<error-message>(.*)<\/error-message>/', $response, $matches);
+                    $error_msg = $matches[1] ?? $response;
+                    echo "[CommissionJunction][Error] " . $error_msg . PHP_EOL;
+                    var_dump($error_msg);
+                    throw new \Exception($error_msg);
+                }
 
                 $arrResponse = xml2array($response);
 
                 if (!is_array($arrResponse) || count($arrResponse) <= 0) {
                     return $arrResult;
                 }
-                if (!isset($arrResponse['cj-api']['links'])){
+                if (!isset($arrResponse['cj-api']['links'])) {
                     return $arrResult;
                 }
-                $arrResult->page=$arrResponse['cj-api']['links_attr']['page-number'];
-                $arrResult->items=$arrResponse['cj-api']['links_attr']['records-returned'];
-                $arrResult->total=$arrResponse['cj-api']['links_attr']['total-matched'];
+                if (!isset($arrResponse['cj-api']['links']['link'])) {
+                    return $arrResult;
+                }
+                $arrResult->page = $arrResponse['cj-api']['links_attr']['page-number'];
+                $arrResult->items = $arrResponse['cj-api']['links_attr']['records-returned'];
+                $arrResult->total = $arrResponse['cj-api']['links_attr']['total-matched'];
                 ($arrResult->total > 0) ? $arrResult->num_pages = (int)ceil($arrResult->total / $records_per_page) : $arrResult->num_pages = 0;
-                $a_links = $arrResponse['cj-api']['links']['link'];
 
+                $a_links = $arrResponse['cj-api']['links']['link'];
                 foreach ($a_links as $link) {
+                    if (!isset($link['link-id'])) {
+                        continue;
+                    }
                     $Deal = Deal::createInstance();
                     $Deal->deal_ID = $link['link-id'];
                     $Deal->name = $link['link-name'];
@@ -196,11 +201,10 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
                     $arrResult->deals[0][] = $Deal;
                 }
                 $page++;
-            }
-            catch (\Exception $e){
-	            echo "[CommissionJunction][Error] " . $e->getMessage() . PHP_EOL;
-	            var_dump($e->getTraceAsString());
-	            throw new \Exception($e);
+            } catch (\Exception $e) {
+                echo "[CommissionJunction][Error] " . $e->getMessage() . PHP_EOL;
+                var_dump($e->getTraceAsString());
+                throw new \Exception($e);
             }
         }
 
@@ -225,10 +229,10 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             }
         }
         */
-        $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom,$dateTo);
+        $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         //echo "<br>merchants id array<br>".print_r($arrMerchantID);
         //$counter=0;
-        foreach($transactionList as $transaction) {
+        foreach ($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->status = $transaction['status'];
             $Transaction->amount = $transaction['amount'];
@@ -248,7 +252,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
             // considero transazioni valide solo quelle di tipo original come viene fatto dal report consultabile sul sito web di c.j.
             // Don't check for 'original' to get DECLINED transactions - 2017-12-13 <PN>
             // if ($transaction['original'] == 'true') {
-                $arrResult[] = $Transaction;
+            $arrResult[] = $Transaction;
             // }
             /*
             echo "custom_id ".$transaction['custom_id']." unique_id ".$transaction['unique_id']." aid ".$transaction['aid']." commission-id ".$transaction['commission-id'].
@@ -285,7 +289,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
     }
 
     /**
-     * @param  array $params
+     * @param array $params
      *
      * @return ProductsResultset
      */
@@ -295,28 +299,27 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         throw new \Exception("Not implemented yet");
     }
 
-	/**
-	 * Api call CommissionJunction
-	 */
-	private function _apiCall($url)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		if (!empty($this->_publisher_id)) {
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_passwordApi));
-		}
-		else {
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_passwordApi));
-		}
+    /**
+     * Api call CommissionJunction
+     */
+    private function _apiCall($url)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        if (!empty($this->_publisher_id)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_passwordApi));
+        } else {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_passwordApi));
+        }
 
-		$curl_results = curl_exec($ch);
-		curl_close($ch);
-		return $curl_results;
-	}
+        $curl_results = curl_exec($ch);
+        curl_close($ch);
+        return $curl_results;
+    }
 
 
     public function getTrackingParameter()
@@ -324,8 +327,9 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
         return $this->_tracking_parameter;
     }
 
-    public function addAllowedSite($idSite){
-        if (trim($idSite)!=''){
+    public function addAllowedSite($idSite)
+    {
+        if (trim($idSite) != '') {
             $this->_network->addAllowedSite($idSite);
         }
     }
