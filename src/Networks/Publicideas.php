@@ -151,8 +151,9 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
     /**
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
-     * @param int $merchantID
+     * @param array $arrMerchantID
      * @return array of Transaction
+     * @throws \Exception
      */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
@@ -183,6 +184,7 @@ class Publicideas extends AbstractNetwork implements NetworkInterface
                     $myTransaction->custom_ID = $transaction['custom_id'];
                     $myTransaction->title = $transaction['title'];
                     $myTransaction->unique_ID = $transaction['unique_id'];
+                    $myTransaction->commission_ID = $transaction['commission_id'];
                     $myTransaction->commission = $transaction['commission'];
                     if (!empty($transaction['date'])) {
                         $date = new \DateTime($transaction['date']);

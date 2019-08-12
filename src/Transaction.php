@@ -123,6 +123,8 @@ class Transaction
      */
     public $original = true;    // Used by Commission Junction - added 2018-07-13 <PN>
 
+    public $commission_ID = ''; // Used by Publicideas - added 2019-08-12 <JC>
+
     /**
      * @method createInstance
      * @return obj istance
