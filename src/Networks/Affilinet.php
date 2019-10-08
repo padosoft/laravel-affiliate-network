@@ -91,7 +91,8 @@ class Affilinet extends AbstractNetwork implements NetworkInterface
             $Merchant->status = $merchant['status'];
             if (!empty($merchant['launch_date'])) {
                 $date = new \DateTime($merchant['launch_date']);
-                $Merchant->launch_dates = $date;
+                //TODO check date format
+                //$Merchant->launch_date = $date;
             }
             $arrResult[] = $Merchant;
         }

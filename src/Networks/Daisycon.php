@@ -81,11 +81,12 @@ class Daisycon extends AbstractNetwork implements NetworkInterface
             $Merchant->status = $merchant['status'];
             if (!empty($merchant['start_date'])) {
                 if ($merchant['start_date'] == '0000-00-00') {
-                    $Merchant->launch_dates = null;
+                    $Merchant->launch_date = null;
                 }
                 else {
                     $date = new \DateTime($merchant['start_date']);
-                    $Merchant->launch_dates = $date;
+                    //TODO check date format
+                    //$Merchant->launch_date = $date;
                 }
             }
             if (!empty($merchant['end_date'])) {

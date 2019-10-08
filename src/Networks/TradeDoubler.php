@@ -40,12 +40,12 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
 	 */
     public function __construct(string $username, string $password, string $idSite = '')
     {
-        $this->_network = new TradeDoublerEx;
+        $this->_network = new \Oara\Network\Publisher\TradeDoubler;
         $this->_username = $username;
         $this->_password = $password;
 	    $this->_idSite = $idSite;
         $this->_apiClient = null;
-        $this->login( $this->_username, $this->_password );
+        $this->login( $this->_username, $this->_password, $this->_idSite );
     }
 
     public function login(string $username, string $password, string $idSite = ''): bool
@@ -94,6 +94,15 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
+            $Merchant->status = $merchant['status'];
+            if (!empty($merchant['launch_date'])) {
+                $date = new \DateTime($merchant['launch_date']);
+                $Merchant->launch_date = $date;
+            }
+            if (!empty($merchant['application_date'])) {
+                $date = new \DateTime($merchant['application_date']);
+                $Merchant->application_date = $date;
+            }
             $arrResult[] = $Merchant;
         }
 
@@ -189,12 +198,6 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
             return array();
         }
         $arrResult = array();
-        if (count( $arrMerchantID ) < 1) {
-            $merchants = $this->getMerchants();
-            foreach ($merchants as $merchant) {
-                $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
-            }
-        }
         $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
@@ -223,7 +226,7 @@ class TradeDoubler extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
-        return array();        
+        return array();
     }
 
 

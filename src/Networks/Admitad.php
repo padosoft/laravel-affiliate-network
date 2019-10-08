@@ -83,7 +83,8 @@ class Admitad extends AbstractNetwork implements NetworkInterface
             $Merchant->name = $merchant['name'];
             $Merchant->status = $merchant['status'];
             $Merchant->url = $merchant['url'];
-            $Merchant->launch_dates = $merchant['launch_date'];
+            //TODO check date format
+            //$Merchant->launch_date = $merchant['launch_date'];
             $arrResult[] = $Merchant;
         }
         return $arrResult;
