@@ -142,6 +142,9 @@ class ShareASale extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
         $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach ($transactionList as $transaction) {
+            if (isset($transaction['commission']) && $transaction['commission'] < 0){
+                continue;
+            }
             $Transaction = Transaction::createInstance();
             if (isset($transaction['currency']) && !empty($transaction['currency'])) {
                 $Transaction->currency = $transaction['currency'];
