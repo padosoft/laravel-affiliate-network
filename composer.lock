@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "90f6506da6cebf5cfc4e88c1ab4d9d11",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.5.58",
+            "version": "2.5.59",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "90567d633c252eab76b8ce48df73501d39ed1cea"
+                "reference": "1154aa2f2be6589c3077708ab4b2a83420f0870e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/90567d633c252eab76b8ce48df73501d39ed1cea",
-                "reference": "90567d633c252eab76b8ce48df73501d39ed1cea",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/1154aa2f2be6589c3077708ab4b2a83420f0870e",
+                "reference": "1154aa2f2be6589c3077708ab4b2a83420f0870e",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2019-11-05T15:35:50+00:00"
+            "time": "2019-12-10T15:01:28+00:00"
         },
         {
             "name": "padosoft/support",
