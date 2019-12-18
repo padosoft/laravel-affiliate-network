@@ -39,7 +39,7 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
 
         $this->login( $this->_username, $this->_password, $idSite );
     }
-    
+
     public function login(string $username, string $password,string $idSite=''): bool{
         $this->_logged = false;
         if (isNullOrEmpty( $username ) || isNullOrEmpty( $password )) {
@@ -135,6 +135,7 @@ class LinkShare extends AbstractNetwork implements NetworkInterface
     {
 
         $arrResult = array();
+        $this->_network->_nid = $_ENV['LINKSHARE_NETWORK'];
         $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
