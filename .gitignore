@@ -28,3 +28,6 @@ Homestead.yaml
 Homestead.json
 composer.phar
 analyticstracking.php
+/.idea
+/.vscode
+
