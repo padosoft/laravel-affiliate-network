@@ -77,19 +77,8 @@ class LeadAlliance extends AbstractNetwork implements NetworkInterface
      */
     public function getMerchants(): array
     {
+        // Not implemented yet
         $arrResult = array();
-        // TODO
-        /*
-        $merchantList = $this->_network->getMerchantList();
-        foreach ($merchantList as $merchant) {
-            $Merchant = Merchant::createInstance();
-            $Merchant->merchant_ID = $merchant['cid'];
-            $Merchant->name = $merchant['name'];
-            $Merchant->status = $merchant['status'];
-            $Merchant->url = $merchant['url'];
-            $arrResult[] = $Merchant;
-        }
-        */
         return $arrResult;
     }
 
@@ -102,33 +91,7 @@ class LeadAlliance extends AbstractNetwork implements NetworkInterface
      */
     public function getDeals($merchantID = NULL, int $page = 0, int $items_per_page = 100): DealsResultset
     {
-        $arrResult = array();
-        $result = DealsResultset::createInstance();
-        // TODO
-        /*
-        $arrVouchers = $this->_network->getVouchers();
-
-        foreach ($arrVouchers as $voucher) {
-            if (!empty($voucher['tracking']) && !empty($voucher['advertiser_id'])) {
-                $Deal = Deal::createInstance();
-                $Deal->deal_ID = md5($voucher['tracking']);    // Use link to generate a unique deal ID
-                $Deal->merchant_ID = $voucher['advertiser_id'];
-                $Deal->merchant_name = $voucher['advertiser_name'];
-                $Deal->code = $voucher['code'];
-                $Deal->name = $voucher['name'];
-                $Deal->description = $voucher['description'];
-                $Deal->start_date = $voucher['start_date'];
-                $Deal->end_date = $voucher['end_date'];
-                $Deal->default_track_uri = $voucher['tracking'];
-                $Deal->is_exclusive = false;
-                $Deal->deal_type = $voucher['type'];
-                $arrResult[] = $Deal;
-            }
-        }
-        */
-        $result->deals[] = $arrResult;
-
-        return $result;
+        throw new \Exception("Not implemented yet");
     }
 
     /**
@@ -159,10 +122,10 @@ class LeadAlliance extends AbstractNetwork implements NetworkInterface
             array_key_exists_safe($transaction, 'custom_id') ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
             $Transaction->unique_ID = $transaction['unique_id'];
             $Transaction->commission = $transaction['commission'];
-            $Transaction->date = $transaction['date'];
+            $Transaction->date = new \DateTime($transaction['date']);
             // Future use - Only few providers returns these dates values - <PN> - 2017-06-29
             if (isset($transaction['click_date']) && !empty($transaction['click_date'])) {
-                $Transaction->click_date = $transaction['click_date'];
+                $Transaction->click_date = new \DateTime($transaction['click_date']);
             }
             if (isset($transaction['update_date']) && !empty($transaction['update_date'])) {
                 $Transaction->update_date = new \DateTime($transaction['update_date']);
