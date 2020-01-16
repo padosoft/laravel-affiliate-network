@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "90f6506da6cebf5cfc4e88c1ab4d9d11",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.5.62",
+            "version": "2.5.63",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "54bf8c5b08ca6d0eaa833dcdebe9d506f6156f22"
+                "reference": "89cb4b223f4273477380a7054e6621d4961321b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/54bf8c5b08ca6d0eaa833dcdebe9d506f6156f22",
-                "reference": "54bf8c5b08ca6d0eaa833dcdebe9d506f6156f22",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/89cb4b223f4273477380a7054e6621d4961321b8",
+                "reference": "89cb4b223f4273477380a7054e6621d4961321b8",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2019-12-11T17:17:26+00:00"
+            "time": "2020-01-16T13:52:18+00:00"
         },
         {
             "name": "padosoft/support",
@@ -685,6 +685,7 @@
                 "dom",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-dom",
             "time": "2018-04-09T20:18:00+00:00"
         }
     ],
