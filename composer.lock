@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.5.63",
+            "version": "2.5.64",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "89cb4b223f4273477380a7054e6621d4961321b8"
+                "reference": "5f865953fe5e7c45d92c40d3a6a6d9a14bd604d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/89cb4b223f4273477380a7054e6621d4961321b8",
-                "reference": "89cb4b223f4273477380a7054e6621d4961321b8",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/5f865953fe5e7c45d92c40d3a6a6d9a14bd604d7",
+                "reference": "5f865953fe5e7c45d92c40d3a6a6d9a14bd604d7",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2020-01-16T13:52:18+00:00"
+            "time": "2020-01-29T16:31:19+00:00"
         },
         {
             "name": "padosoft/support",
