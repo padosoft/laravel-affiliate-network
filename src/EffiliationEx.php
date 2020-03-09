@@ -21,7 +21,7 @@ class EffiliationEx extends EffiliationOara{
             $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
             // Retrieve by date transaction instead of date click (type=datetran)- <PN> 2017-07-05
-            $url = 'http://api.effiliation.com/apiv2/transaction.csv?key=' . $this->_credentials["apiPassword"] . '&start=' . $dStartDate->format("d/m/Y") . '&end=' . $dEndDate->format("d/m/Y") . '&type=datetran&all=yes';
+            $url = 'https://api.effiliation.com/apiv2/transaction.csv?key=' . $this->_credentials["apiPassword"] . '&start=' . $dStartDate->format("d/m/Y") . '&end=' . $dEndDate->format("d/m/Y") . '&type=datetran&all=yes&timestamp=' . time();
             // Set timeout to 300 secs. due to api delays - <PN> 2017-06-20
             $ctx = stream_context_create(array(
                     'http' => array(
@@ -43,42 +43,42 @@ class EffiliationEx extends EffiliationOara{
                 // <PN> 2017-06-22
                 // if (isset($merchantIdList[(int)$transactionExportArray[2]])) {
 
-                    $transaction = Array();
-                    $merchantId = (int)$transactionExportArray[2];
-                    $transaction['merchantId'] = $merchantId;
-                    // Changed Transaction date index from 10 to 12 - 2018-01-01 <PN>
-                    $transaction['date'] = $transactionExportArray[12];
-                    $transaction["click_date"] = $transactionExportArray[11]; // Added <PN>
-                    $transaction['unique_id'] = $transactionExportArray[0];
-                    $transaction['custom_id'] = '';
-                    $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    if ($transactionExportArray[4] != null) {
-                        $transaction['custom_id'] = $transactionExportArray[4];
-                    }
+                $transaction = Array();
+                $merchantId = (int)$transactionExportArray[2];
+                $transaction['merchantId'] = $merchantId;
+                // Changed Transaction date index from 10 to 12 - 2018-01-01 <PN>
+                $transaction['date'] = $transactionExportArray[12];
+                $transaction["click_date"] = $transactionExportArray[11]; // Added <PN>
+                $transaction['unique_id'] = $transactionExportArray[0];
+                $transaction['custom_id'] = '';
+                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                if ($transactionExportArray[4] != null) {
+                    $transaction['custom_id'] = $transactionExportArray[4];
+                }
 
-                    switch ($transactionExportArray[9]) {
-                        case 'Valide':
-                            $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                            break;
-                        case 'Attente':
-                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                            break;
-                        case 'Refusé':
-                        case 'Refuse':
-                            // Handle both variations - <PN> - 2017-06-21
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            break;
-                        default:
-                            // Invalid status
-                            echo PHP_EOL."EffiliationEx - Invalid transaction status: " . $transactionExportArray[9] . " (transaction id = " . $transactionExportArray[0] . ")";
-                            break;
-                    }
-                    $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
-                    $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
-                    // Get absolute values - 2017-12-13 <PN>
-                    $transaction ['amount'] = \abs($transaction ['amount']);
-                    $transaction ['commission'] = \abs($transaction ['commission']);
-                    $totalTransactions[] = $transaction;
+                switch ($transactionExportArray[9]) {
+                    case 'Valide':
+                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        break;
+                    case 'Attente':
+                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                        break;
+                    case 'Refusé':
+                    case 'Refuse':
+                        // Handle both variations - <PN> - 2017-06-21
+                        $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                        break;
+                    default:
+                        // Invalid status
+                        echo PHP_EOL."EffiliationEx - Invalid transaction status: " . $transactionExportArray[9] . " (transaction id = " . $transactionExportArray[0] . ")";
+                        break;
+                }
+                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
+                $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
+                // Get absolute values - 2017-12-13 <PN>
+                $transaction ['amount'] = \abs($transaction ['amount']);
+                $transaction ['commission'] = \abs($transaction ['commission']);
+                $totalTransactions[] = $transaction;
                 // }
             }
         } catch (\Exception $e) {
