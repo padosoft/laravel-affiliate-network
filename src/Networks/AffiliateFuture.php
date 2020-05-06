@@ -136,13 +136,13 @@ class AffiliateFuture extends AbstractNetwork implements NetworkInterface
                         $myTransaction->currency = $transaction['currency'];
                         $arrResult[] = $myTransaction;
                     } catch (\Exception $e) {
-                        echo "<br><br>Transaction Error Partnerize, id: " . $myTransaction['unique_id'] . " msg: ".$e->getMessage()."<br><br>";
+                        echo "[AffiliateFuture][Error] id: " . $myTransaction['unique_id'] . " msg: ".$e->getMessage();
                         var_dump($e->getTraceAsString());
                     }
                 }
             }
         } catch (\Exception $e) {
-            echo "<br><br>Generic Error Partnerize: ".$e->getMessage()."<br><br>";
+            echo "[AffiliateFuture][Error] ". $e->getMessage();
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
         }
@@ -157,7 +157,7 @@ class AffiliateFuture extends AbstractNetwork implements NetworkInterface
      */
     public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
     {
-        return array();        
+        return array();
     }
 
 
