@@ -49,8 +49,8 @@ class PepperJamApi extends AbstractNetwork implements NetworkInterface
             $merchant->name = $rawMerchant['name'];
             $merchant->status = $rawMerchant['status'];
             $merchant->url = $rawMerchant['url'];
-            if (!empty($rawMerchant['launch_date'])) {
-                $merchant->launch_date = new \DateTime($rawMerchant['launch_date']);
+            if (!empty($rawMerchant['application_date'])) {
+                $merchant->application_date = new \DateTime($rawMerchant['application_date']);
             }
             return $merchant;
         }, $this->_network->getMerchantList());
