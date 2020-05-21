@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e61e82fab69b9b1dc4aeb28d80239f5c",
+    "content-hash": "90f6506da6cebf5cfc4e88c1ab4d9d11",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "dev-pepperjam-api",
+            "version": "2.5.70",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "453541c2091b37d91fa7d316cd0895c01514eae7"
+                "reference": "6e1d8afed18f6ed12e1a590d6f369a559f786b55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/453541c2091b37d91fa7d316cd0895c01514eae7",
-                "reference": "453541c2091b37d91fa7d316cd0895c01514eae7",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/6e1d8afed18f6ed12e1a590d6f369a559f786b55",
+                "reference": "6e1d8afed18f6ed12e1a590d6f369a559f786b55",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2020-05-21T09:18:15+00:00"
+            "time": "2020-05-21T12:33:55+00:00"
         },
         {
             "name": "padosoft/support",
@@ -2007,9 +2007,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "padosoft/php-oara": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
