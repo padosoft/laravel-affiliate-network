@@ -86,7 +86,7 @@ class PepperJamApi extends AbstractNetwork implements NetworkInterface
             $transaction->date = new \DateTime($rawTransaction['date']);
             $transaction->merchant_ID = $rawTransaction['program_id'];
             $transaction->campaign_name =  $rawTransaction['program_name'];
-            $transaction->custom_id = $rawTransaction['custom_id'];
+            $transaction->custom_ID = $rawTransaction['custom_id'];
 
             $transaction->approved = false;
             if ($transaction->status == \Oara\Utilities::STATUS_CONFIRMED) {
