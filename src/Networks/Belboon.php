@@ -2,13 +2,13 @@
 
 namespace Padosoft\AffiliateNetwork\Networks;
 
-use Padosoft\AffiliateNetwork\Transaction;
-use Padosoft\AffiliateNetwork\Merchant;
-use Padosoft\AffiliateNetwork\Stat;
 use Padosoft\AffiliateNetwork\Deal;
+use Padosoft\AffiliateNetwork\Stat;
+use Padosoft\AffiliateNetwork\Merchant;
+use Padosoft\AffiliateNetwork\Transaction;
+use Padosoft\AffiliateNetwork\DealsResultset;
 use Padosoft\AffiliateNetwork\AbstractNetwork;
 use Padosoft\AffiliateNetwork\NetworkInterface;
-use Padosoft\AffiliateNetwork\DealsResultset;
 use Padosoft\AffiliateNetwork\ProductsResultset;
 
 /**
@@ -21,40 +21,16 @@ class Belboon extends AbstractNetwork implements NetworkInterface
      * @var object
      */
     private $_network = null;
-    private $_apiClient = null;
-    private $_password = '';
-    private $_idSite = '';
-    protected $_tracking_parameter    = '/subid1';
+    protected $_tracking_parameter    = 'scm1';
 
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password,string $idSite='')
+    public function __construct(string $username, string $password, string $idSite='')
     {
-        $this->_network = new \Padosoft\AffiliateNetwork\BelboonEx;
-        $this->_username = $username;
-        $this->_password = $password;
-        $this->login( $this->_username, $this->_password, $idSite );
-        $this->_apiClient = null;
-    }
-
-    public function login(string $username, string $password, string $idSite=''): bool{
-        $this->_logged = false;
-        if (isNullOrEmpty( $password )) {
-
-            return false;
-        }
-        $this->_username = $username;
-        $this->_password = $password;
-        $this->_idSite = $idSite;
-        $credentials = array();
-        $credentials["user"] = $this->_username;
-        $credentials["apipassword"] = $this->_password;
-        $credentials['id_site'] = $idSite;
-        if ($this->_network->login($credentials)) {
-            $this->_logged = true;
-        }
-        return $this->_logged;
+        $apiKey = $_ENV["BELBOON_API_KEY"];
+        $userId = $_ENV["BELBOON_USER_ID"];
+        $this->_network = new \Oara\Network\Publisher\Belboon($apiKey, $userId);
     }
 
     /**
@@ -62,7 +38,7 @@ class Belboon extends AbstractNetwork implements NetworkInterface
      */
     public function checkLogin() : bool
     {
-        return $this->_logged;
+        return true;
     }
 
     /**
@@ -75,12 +51,10 @@ class Belboon extends AbstractNetwork implements NetworkInterface
         }
         $arrResult = array();
         $merchantList = $this->_network->getMerchantList();
-        foreach($merchantList as $merchant) {
+        foreach ($merchantList as $merchant) {
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
-            $Merchant->status = $merchant['status'];
-            $Merchant->url = $merchant['url'];
             $arrResult[] = $Merchant;
         }
 
@@ -91,82 +65,44 @@ class Belboon extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals($merchantID=NULL,int $page=0,int $items_per_page=10 ): DealsResultset
+    public function getDeals($merchantID=null, int $page=0, int $items_per_page=10): DealsResultset
     {
+        $dealList = $this->_network->getVouchers();
+
+        // only the type voucher is imported
+        // possible types:
+        // discount_all, discount_single, free_ship, freebie, misc, ''
+        $onlyVouchersDeals = array_filter(
+            $dealList,
+            function ($deal) {
+                // the deal types can be multiple...
+                $dealTypes = $deal["voucher_type"];
+                $isDiscountAll = strpos($dealTypes, 'discount_all') != false;
+                $isDiscountSingle = strpos($dealTypes, 'discount_single') != false;
+                $isEmpty = $dealTypes == '';
+
+                return $isDiscountAll || $isDiscountSingle || $isEmpty;
+            }
+        );
+
         $result = DealsResultset::createInstance();
 
-        if (!isset($_ENV['BELBOON_API_VOUCHER_KEY'])) {
-            throw new \Exception("Belboon api key not defined");
-        }
-        $apiKey = $_ENV['BELBOON_API_VOUCHER_KEY'];
+        $deals = array_map(function ($rawDeal) {
+            $deal = new Deal();
+            $deal->deal_ID = $rawDeal["vcid"];
+            $deal->merchant_ID = $rawDeal["mid"];
+            $deal->code = $rawDeal["codes"];
+            $deal->description = $rawDeal["description"];
+            $deal->start_date = $deal->convertDate($rawDeal["date_from"]);
+            $deal->end_date = $deal->convertDate($rawDeal["date_to"]);
+            $deal->landing_url = $rawDeal["landingpage"];
+            $deal->discount_amount = $rawDeal["discount_amount"];
+            $deal->minimum_order_value = $rawDeal["min_order_value"];
+            $deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+            return $deal;
+        }, $onlyVouchersDeals);
 
-        $arrResult = array();
-
-
-        $vouchers = array();
-
-        try {
-            $params = array(
-                new \Oara\Curl\Parameter('key', $apiKey),
-                new \Oara\Curl\Parameter('platformid', $this->_idSite),
-                new \Oara\Curl\Parameter('status', 'all'),
-                new \Oara\Curl\Parameter('format', 'csv'),
-            );
-
-            $credentials = [];
-            $exportClient = new \Oara\Curl\Access($credentials);
-
-
-            $urls[] = new \Oara\Curl\Request('https://ui.belboon.com/export/vouchercodes/?', $params);
-            $result = $exportClient->get($urls);
-            if ($result === false || !is_array($result))
-            {
-                throw new \Exception("Belboon getVouchers - http error");
-            } else {
-                $vouchers = \str_getcsv($result[0], "\n");
-            }
-        } catch (\Exception $e) {
-            echo "Belboon getVouchers error:".$e->getMessage()."\n ";
-            throw new \Exception($e);
-        }
-
-        foreach($vouchers as $obj_voucher) {
-
-            $voucher = str_getcsv($obj_voucher, ';', '"');
-
-            $promotionId = $voucher[2];
-            if (!is_numeric($promotionId)) {
-                continue;
-            }
-            $advertiser = $voucher[2];
-            $advertiserId = $voucher[2];
-            $type = $voucher[4];
-            $code = $voucher[5];
-            $description = $voucher[9];
-            $starts = $voucher[7];
-            $ends = $voucher[8];
-            $deeplink_tracking = $voucher[10];
-            $exclusive = $voucher[0];
-
-            if ($merchantID > 0) {
-                if ($advertiserId != $merchantID) {
-                    continue;
-                }
-            }
-
-            $Deal = Deal::createInstance();
-            $Deal->deal_ID = $promotionId;
-            $Deal->merchant_ID = $advertiserId;
-            $Deal->code = $code;
-            $Deal->description = $description;
-            $Deal->start_date = $Deal->convertDate($starts);
-            $Deal->end_date = $Deal->convertDate($ends);
-            $Deal->default_track_uri = $deeplink_tracking;
-            $Deal->is_exclusive = $exclusive;
-            $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
-            $arrResult[] = $Deal;
-        }
-        $result->deals[]=$arrResult;
+        $result->deals[] = $deals;
 
         return $result;
     }
@@ -181,15 +117,9 @@ class Belboon extends AbstractNetwork implements NetworkInterface
     {
         $arrResult = array();
         try {
-            if (count( $arrMerchantID ) < 1) {
-                $merchants = $this->getMerchants();
-                foreach ($merchants as $merchant) {
-                    $arrMerchantID[$merchant->merchant_ID] = ['cid' => $merchant->merchant_ID, 'name' => $merchant->name];
-                }
-            }
-             $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
+            $transactionList = $this->_network->getTransactionList(null, $dateFrom, $dateTo);
 
-            foreach($transactionList as $transaction) {
+            foreach ($transactionList as $transaction) {
                 $myTransaction = Transaction::createInstance();
                 try {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
@@ -198,6 +128,10 @@ class Belboon extends AbstractNetwork implements NetworkInterface
                     if (!empty($transaction['date'])) {
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+                    }
+                    if (!empty($transaction['click_date'])) {
+                        $date = new \DateTime($transaction['click_date']);
+                        $myTransaction->click_date = $date; // $date->format('Y-m-d H:i:s');
                     }
                     if (!empty($transaction['lastchangedate'])) {
                         $date = new \DateTime($transaction['lastchangedate']);
@@ -208,8 +142,9 @@ class Belboon extends AbstractNetwork implements NetworkInterface
                     $myTransaction->status = $transaction['status'];
                     $myTransaction->amount = $transaction['amount'];
                     $myTransaction->commission = $transaction['commission'];
+
                     $myTransaction->approved = false;
-                    if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED){
+                    if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED) {
                         $myTransaction->approved = true;
                     }
                     $arrResult[] = $myTransaction;
@@ -263,7 +198,8 @@ class Belboon extends AbstractNetwork implements NetworkInterface
         throw new \Exception("Not implemented yet");
     }
 
-    public function getTrackingParameter(){
+    public function getTrackingParameter()
+    {
         return $this->_tracking_parameter;
     }
 }

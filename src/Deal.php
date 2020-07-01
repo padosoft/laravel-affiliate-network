@@ -223,6 +223,9 @@ class Deal
             $date = \DateTime::createFromFormat('Y-m-d',substr($source,0,10));
         }
         if ($date === false) {
+            $date = \DateTime::createFromFormat('d.m.Y', $source);
+        }
+        if ($date === false) {
             $date = \DateTime::createFromFormat('Y-m-d H:i:s','2000-01-01 00:00:00');
         }
         return $date;
