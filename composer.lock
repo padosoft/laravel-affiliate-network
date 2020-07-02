@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ffdd10c2365ce77eb36bf020aaf37d06",
+    "content-hash": "e8aa6b6dcf0aa9c3d68874fee5a14a3c",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,11 +227,17 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "dev-new_belboon_api",
+            "version": "2.5.74",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/padosoft/php-oara.git",
+                "reference": "cc3405f362691c9ecbe0bce7af7bd8d2e0da980a"
+            },
             "dist": {
-                "type": "path",
-                "url": "../php-oara",
-                "reference": "6f88fd522156b6ea55b8d1995de69439d2060ac1"
+                "type": "zip",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/cc3405f362691c9ecbe0bce7af7bd8d2e0da980a",
+                "reference": "cc3405f362691c9ecbe0bce7af7bd8d2e0da980a",
+                "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
@@ -245,7 +251,9 @@
                     "Oara": ""
                 }
             },
-            "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format."
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
+            "time": "2020-07-02T11:01:01+00:00"
         },
         {
             "name": "padosoft/support",
@@ -2004,9 +2012,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "padosoft/php-oara": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
