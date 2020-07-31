@@ -148,7 +148,7 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
                     '&promotion-type=coupon'
                 );
 
-                if ($response === false || \preg_match("/error/", $response)) {
+                if ($response === false || \preg_match("/<error-message>/", $response)) {
                     preg_match('/<error-message>(.*)<\/error-message>/', $response, $matches);
                     $error_msg = $matches[1] ?? $response;
                     echo "[CommissionJunction][Error] " . $error_msg . PHP_EOL;
