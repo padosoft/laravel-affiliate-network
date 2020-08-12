@@ -70,7 +70,8 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     public function getMerchants() : array
     {
         $arrResult = array();
-        $url = 'http://api.effiliation.com/apiv2/programs.xml?key=' . $this->_password . "&filter=all";
+        // Fixed endpoint to apiv2.effiliation.com <PN> 2020-08-12
+        $url = 'http://apiv2.effiliation.com/apiv2/programs.xml?key=' . $this->_password . "&filter=all";
         echo "effiliation getMerchant url ",PHP_EOL;
         $content = @\file_get_contents($url);
         $xml = \simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
@@ -102,6 +103,7 @@ class Effiliation extends AbstractNetwork implements NetworkInterface
     {
         $result = DealsResultset::createInstance();
 
+        // Fixed endpoint to apiv2.effiliation.com <PN> 2020-08-12
         $url = 'http://apiv2.effiliation.com/apiv2/commercialtrades.json?filter=mines&key='.$this->_password;
         $json = file_get_contents($url);
 
