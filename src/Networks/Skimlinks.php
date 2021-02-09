@@ -37,6 +37,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
         $this->_network = new \Oara\Network\Publisher\Skimlinks;
         $this->_username = $username;
         $this->_password = $password;
+        $this->_country = $country;
         $this->login( $this->_username, $this->_password, $idSite, $this->_country);
         $this->_apiClient = null;
 
@@ -142,7 +143,7 @@ class Skimlinks extends AbstractNetwork implements NetworkInterface
              $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
 
             foreach($transactionList as $transaction) {
-                
+
                 $myTransaction = Transaction::createInstance();
                 try {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
