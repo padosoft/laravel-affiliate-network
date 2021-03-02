@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb2c728ac2c60591f7c2920bdd89066d",
+    "content-hash": "23e19ff475621c4b9f2606902dd0b446",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.5.79",
+            "version": "2.5.80",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "215a678434fa751c44adfbea991f737dfdc53173"
+                "reference": "aa874cd3a957625ef329adb22de85bc81431b419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/215a678434fa751c44adfbea991f737dfdc53173",
-                "reference": "215a678434fa751c44adfbea991f737dfdc53173",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/aa874cd3a957625ef329adb22de85bc81431b419",
+                "reference": "aa874cd3a957625ef329adb22de85bc81431b419",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2020-12-07T11:06:09+00:00"
+            "time": "2021-03-02T09:49:24+00:00"
         },
         {
             "name": "padosoft/support",
@@ -1965,12 +1965,12 @@
             "version": "1.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webmozart/assert.git",
+                "url": "https://github.com/webmozarts/assert.git",
                 "reference": "2db61e59ff05fe5126d152bd0655c9ea113e550f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/2db61e59ff05fe5126d152bd0655c9ea113e550f",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/2db61e59ff05fe5126d152bd0655c9ea113e550f",
                 "reference": "2db61e59ff05fe5126d152bd0655c9ea113e550f",
                 "shasum": ""
             },
