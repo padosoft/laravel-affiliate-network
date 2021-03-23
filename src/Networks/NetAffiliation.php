@@ -131,7 +131,7 @@ class NetAffiliation extends AbstractNetwork implements NetworkInterface
         $arrResult = array();
         $arrResponse = xml2array($xml);
         if(!is_array($arrResponse) || count($arrResponse) <= 0) {
-            return $arrResult;
+            return $result;
         }
 
         $arrItems = $arrResponse['listing']['item'];
