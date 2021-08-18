@@ -1,5 +1,4 @@
 <?php
-
 namespace Padosoft\AffiliateNetwork\Networks;
 
 use Padosoft\AffiliateNetwork\Deal;
@@ -21,22 +20,24 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
      * @var object
      */
     private $_network = null;
-    protected $_tracking_parameter    = 'scm';
+    protected $_tracking_parameter = 'scm';
 
     /**
      * @method __construct
      */
-    public function __construct(string $username, string $password, string $idSite='')
+    public function __construct(string $username, string $password, string $idSite = '')
     {
         $apiKey = $_ENV["BELBOON_WHITELABEL_API_KEY"];
         $userId = $_ENV["BELBOON_WHITELABEL_USER_ID"];
-        $this->_network = new \Oara\Network\Publisher\BelboonWhitelabel($apiKey, $userId);
+        $baseUrl = $_ENV["BELBOON_WHITELABEL_BASE_URL_API"];
+        $this->_network = new \Oara\Network\Publisher\BelboonWhitelabel($apiKey, $userId, $baseUrl);
     }
 
     /**
      * @return bool
      */
-    public function checkLogin() : bool
+    public function checkLogin():
+    bool
     {
         return true;
     }
@@ -44,14 +45,19 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
     /**
      * @return array of Merchants
      */
-    public function getMerchants() : array
+    public function getMerchants():
+    array
     {
-        if (!$this->checkLogin()) {
+        if (!$this->checkLogin())
+        {
             return array();
         }
         $arrResult = array();
-        $merchantList = $this->_network->getMerchantList();
-        foreach ($merchantList as $merchant) {
+        $merchantList = $this
+            ->_network
+            ->getMerchantList();
+        foreach ($merchantList as $merchant)
+        {
             $Merchant = Merchant::createInstance();
             $Merchant->merchant_ID = $merchant['cid'];
             $Merchant->name = $merchant['name'];
@@ -65,29 +71,31 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Deal
      */
-    public function getDeals($merchantID=null, int $page=0, int $items_per_page=10): DealsResultset
+    public function getDeals($merchantID = null, int $page = 0, int $items_per_page = 10):
+    DealsResultset
     {
-        $dealList = $this->_network->getVouchers();
+        $dealList = $this
+            ->_network
+            ->getVouchers();
 
         // only the type voucher is imported
         // possible types:
         // discount_all, discount_single, free_ship, freebie, misc, ''
-        $onlyVouchersDeals = array_filter(
-            $dealList,
-            function ($deal) {
-                // the deal types can be multiple...
-                $dealTypes = $deal["voucher_type"];
-                $isDiscountAll = strpos($dealTypes, 'discount_all') != false;
-                $isDiscountSingle = strpos($dealTypes, 'discount_single') != false;
-                $isEmpty = $dealTypes == '';
+        $onlyVouchersDeals = array_filter($dealList, function ($deal)
+        {
+            // the deal types can be multiple...
+            $dealTypes = $deal["voucher_type"];
+            $isDiscountAll = strpos($dealTypes, 'discount_all') != false;
+            $isDiscountSingle = strpos($dealTypes, 'discount_single') != false;
+            $isEmpty = $dealTypes == '';
 
-                return $isDiscountAll || $isDiscountSingle || $isEmpty;
-            }
-        );
+            return $isDiscountAll || $isDiscountSingle || $isEmpty;
+        });
 
         $result = DealsResultset::createInstance();
 
-        $deals = array_map(function ($rawDeal) {
+        $deals = array_map(function ($rawDeal)
+        {
             $deal = new Deal();
             $deal->deal_ID = $rawDeal["vcid"];
             $deal->merchant_ID = $rawDeal["mid"];
@@ -100,7 +108,8 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
             $deal->minimum_order_value = $rawDeal["min_order_value"];
             $deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
             return $deal;
-        }, $onlyVouchersDeals);
+        }
+            , $onlyVouchersDeals);
 
         $result->deals[] = $deals;
 
@@ -113,27 +122,38 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Transaction
      */
-    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
+    public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()):
+    array
     {
         $arrResult = array();
-        try {
-            $transactionList = $this->_network->getTransactionList(null, $dateFrom, $dateTo);
+        try
+        {
+            $transactionList = $this
+                ->_network
+                ->getTransactionList(null, $dateFrom, $dateTo);
 
-            foreach ($transactionList as $transaction) {
+            foreach ($transactionList as $transaction)
+            {
                 $myTransaction = Transaction::createInstance();
-                try {
+                try
+                {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
-                    $myTransaction->title ='';
-                    $myTransaction->currency ='EUR';
-                    if (!empty($transaction['date'])) {
+                    $myTransaction->title = '';
+                    $myTransaction->currency = 'EUR';
+                    if (!empty($transaction['date']))
+                    {
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
+
                     }
-                    if (!empty($transaction['click_date'])) {
+                    if (!empty($transaction['click_date']))
+                    {
                         $date = new \DateTime($transaction['click_date']);
                         $myTransaction->click_date = $date; // $date->format('Y-m-d H:i:s');
+
                     }
-                    if (!empty($transaction['lastchangedate'])) {
+                    if (!empty($transaction['lastchangedate']))
+                    {
                         $date = new \DateTime($transaction['lastchangedate']);
                         $myTransaction->update_date = $date;
                     }
@@ -144,17 +164,22 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
                     $myTransaction->commission = $transaction['commission'];
 
                     $myTransaction->approved = false;
-                    if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED) {
+                    if ($transaction['status'] == \Oara\Utilities::STATUS_CONFIRMED)
+                    {
                         $myTransaction->approved = true;
                     }
                     $arrResult[] = $myTransaction;
-                } catch (\Exception $e) {
-                    echo "<br><br>errore transazione Belboon Whitelabel, id: ".$myTransaction->unique_ID." msg: ".$e->getMessage()."<br><br>";
+                }
+                catch(\Exception $e)
+                {
+                    echo "<br><br>errore transazione Belboon Whitelabel, id: " . $myTransaction->unique_ID . " msg: " . $e->getMessage() . "<br><br>";
                     var_dump($e->getTraceAsString());
                 }
             }
-        } catch (\Exception $e) {
-            echo "<br><br>errore generico transazione Belboon Whitelabel: ".$e->getMessage()."<br><br>";
+        }
+        catch(\Exception $e)
+        {
+            echo "<br><br>errore generico transazione Belboon Whitelabel: " . $e->getMessage() . "<br><br>";
             var_dump($e->getTraceAsString());
             throw new \Exception($e);
         }
@@ -168,7 +193,8 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
      * @param int $merchantID
      * @return array of Stat
      */
-    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0) : array
+    public function getStats(\DateTime $dateFrom, \DateTime $dateTo, int $merchantID = 0):
+    array
     {
         return array();
         /*
@@ -186,13 +212,13 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
         */
     }
 
-
     /**
      * @param  array $params
      *
      * @return ProductsResultset
      */
-    public function getProducts(array $params = []): ProductsResultset
+    public function getProducts(array $params = []):
+    ProductsResultset
     {
         // TODO: Implement getProducts() method.
         throw new \Exception("Not implemented yet");
@@ -203,3 +229,4 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
         return $this->_tracking_parameter;
     }
 }
+
