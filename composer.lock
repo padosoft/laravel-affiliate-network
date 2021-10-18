@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b752f36a4e8a331ece8e02e1dde5db9",
+    "content-hash": "a4f5496af87007c49c10e742ae2e4c96",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.5.93",
+            "version": "2.5.94",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "c76f507b18d13ec465fff8b7fd54f6b710d04bb6"
+                "reference": "bfc94bc953c166261fc00b8c2f2a9c2c305781b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/c76f507b18d13ec465fff8b7fd54f6b710d04bb6",
-                "reference": "c76f507b18d13ec465fff8b7fd54f6b710d04bb6",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/bfc94bc953c166261fc00b8c2f2a9c2c305781b6",
+                "reference": "bfc94bc953c166261fc00b8c2f2a9c2c305781b6",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2021-10-18T15:04:19+00:00"
+            "time": "2021-10-18T15:57:12+00:00"
         },
         {
             "name": "padosoft/support",
@@ -1860,6 +1860,7 @@
             ],
             "description": "Provides a list of PHP built-in functions that operate on resources",
             "homepage": "https://www.github.com/sebastianbergmann/resource-operations",
+            "abandoned": true,
             "time": "2015-07-28T20:34:47+00:00"
         },
         {
