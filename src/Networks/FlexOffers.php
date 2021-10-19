@@ -142,6 +142,7 @@ class FlexOffers extends AbstractNetwork implements NetworkInterface
             $Transaction->click_date = new \DateTime($transaction['click_date']); // $date->format('Y-m-d H:i:s');
             $Transaction->update_date = new \DateTime($transaction['update_date']);
             $Transaction->transaction_ID = $transaction['unique_id'];
+            $Transaction->unique_ID = $transaction['unique_id'];
             array_key_exists_safe( $transaction,
                 'custom_id' ) ? $Transaction->custom_ID = $transaction['custom_id'] : $Transaction->custom_ID = '';
             $Transaction->status = $transaction['status'];
