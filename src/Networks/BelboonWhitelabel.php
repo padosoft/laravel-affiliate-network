@@ -139,7 +139,7 @@ class BelboonWhitelabel extends AbstractNetwork implements NetworkInterface
                 {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
                     $myTransaction->title = '';
-                    $myTransaction->currency = 'EUR';
+                    $myTransaction->currency = $transaction['currency'];
                     if (!empty($transaction['date']))
                     {
                         $date = new \DateTime($transaction['date']);

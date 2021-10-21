@@ -124,7 +124,7 @@ class Belboon extends AbstractNetwork implements NetworkInterface
                 try {
                     $myTransaction->merchant_ID = $transaction['merchantId'];
                     $myTransaction->title ='';
-                    $myTransaction->currency ='EUR';
+                    $myTransaction->currency = $transaction['currency'];
                     if (!empty($transaction['date'])) {
                         $date = new \DateTime($transaction['date']);
                         $myTransaction->date = $date; // $date->format('Y-m-d H:i:s');
