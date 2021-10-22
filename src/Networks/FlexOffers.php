@@ -137,10 +137,9 @@ class FlexOffers extends AbstractNetwork implements NetworkInterface
         foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
             $Transaction->merchant_ID = $transaction['merchantId'];
-            $date = $transaction['date'];
-            $Transaction->date = new \DateTime($date); // $date->format('Y-m-d H:i:s');
-            $Transaction->click_date = new \DateTime($transaction['click_date']); // $date->format('Y-m-d H:i:s');
-            $Transaction->update_date = new \DateTime($transaction['update_date']);
+            $Transaction->date = $transaction['date']; // already a datetime object
+            $Transaction->click_date = $transaction['click_date'];
+            $Transaction->update_date = $transaction['update_date'];
             $Transaction->transaction_ID = $transaction['unique_id'];
             $Transaction->unique_ID = $transaction['unique_id'];
             array_key_exists_safe( $transaction,
