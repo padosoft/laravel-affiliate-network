@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b71e9e73b3cb7d65cbc1090f5b79d503",
+    "content-hash": "b9c9fa59c471f9bf3400a56e9eede69f",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.6.07",
+            "version": "2.6.08",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "a8c1a340e9f6dbc56d1d3814a9819fbbc2868b9a"
+                "reference": "b246fa6e34b53080b6135649a9d097a7f0e6edc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/a8c1a340e9f6dbc56d1d3814a9819fbbc2868b9a",
-                "reference": "a8c1a340e9f6dbc56d1d3814a9819fbbc2868b9a",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/b246fa6e34b53080b6135649a9d097a7f0e6edc2",
+                "reference": "b246fa6e34b53080b6135649a9d097a7f0e6edc2",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2021-12-29T16:02:34+00:00"
+            "time": "2022-01-11T17:10:16+00:00"
         },
         {
             "name": "padosoft/support",
