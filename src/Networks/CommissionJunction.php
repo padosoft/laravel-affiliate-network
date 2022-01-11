@@ -185,7 +185,12 @@ class CommissionJunction extends AbstractNetwork implements NetworkInterface
                     $Deal->note = $link['description'];
                     $Deal->merchant_ID = $link['advertiser-id'];
                     $Deal->merchant_name = $link['advertiser-name'];
-                    $Deal->default_track_uri = $link['clickUrl'];
+                    if (isset($link['clickUrl'])) {
+                        $Deal->default_track_uri = $link['clickUrl'];
+                    }
+                    else{
+                        $Deal->default_track_uri = '';
+                    }
                     $Deal->description = $link['description'];
                     $Deal->title = $link['link-name'];
                     if (!empty($link['promotion-start-date'])) {
