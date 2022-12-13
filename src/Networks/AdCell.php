@@ -127,7 +127,7 @@ class AdCell extends AbstractNetwork implements NetworkInterface
             $Transaction->merchant_ID = $transaction['merchantId'];
             $Transaction->program_name =  $transaction['merchantName'];
             $Transaction->campaign_name =  $transaction['campaign_name'];
-            $Transaction->IP =  $transaction['IP'];
+            //$Transaction->IP =  $transaction['IP'];
             $Transaction->approved = false;
             if ($Transaction->status == \Oara\Utilities::STATUS_CONFIRMED){
                 $Transaction->approved = true;
