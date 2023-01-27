@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e135d75953a83876dbdeef47ae6caabb",
+    "content-hash": "16ae4516195de60c1490a12ece644d99",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -227,16 +227,16 @@
         },
         {
             "name": "padosoft/php-oara",
-            "version": "2.7.02",
+            "version": "2.7.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padosoft/php-oara.git",
-                "reference": "d33d123b1d0b98f573593308b440136977a3b74c"
+                "reference": "4692b6d111036b1b799b16f64de4cc2e8ffe7895"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/d33d123b1d0b98f573593308b440136977a3b74c",
-                "reference": "d33d123b1d0b98f573593308b440136977a3b74c",
+                "url": "https://api.github.com/repos/padosoft/php-oara/zipball/4692b6d111036b1b799b16f64de4cc2e8ffe7895",
+                "reference": "4692b6d111036b1b799b16f64de4cc2e8ffe7895",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,10 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-            "time": "2022-02-08T09:21:08+00:00"
+            "support": {
+                "source": "https://github.com/padosoft/php-oara/tree/2.7.10"
+            },
+            "time": "2023-01-27T16:07:48+00:00"
         },
         {
             "name": "padosoft/support",
@@ -2020,5 +2023,5 @@
         "php": ">=7.0.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
