@@ -57,8 +57,12 @@ class WebGains extends AbstractNetwork implements NetworkInterface
         $this->_password = $password;
         $this->_idSite = $idSite;
         $credentials = array();
+        $credentials["sitesAllowed"] = array();
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
+        if (!empty($this->_idSite)){
+            $credentials["sitesAllowed"] = explode(",", $this->_idSite);
+        }
         $this->_network->login($credentials);
         if ($this->_network->checkConnection()) {
             $this->_logged = true;
@@ -105,62 +109,66 @@ class WebGains extends AbstractNetwork implements NetworkInterface
         $result = DealsResultset::createInstance();
         $arrResult = array();
         if (!empty($this->_idSite)) {
-            // Account id is correct
-            $arrVouchers = $this->_network->getVouchers($this->_idSite);
+            $a_sites = explode(",", $this->_idSite);
+            foreach ($a_sites as $id_site){
+                // Account id is correct
+                $arrVouchers = $this->_network->getVouchers($id_site);
 
-            foreach ($arrVouchers as $obj_voucher) {
+                foreach ($arrVouchers as $obj_voucher) {
 
-                $voucher = str_getcsv($obj_voucher, ',', '"');
+                    $voucher = str_getcsv($obj_voucher, ',', '"');
 
-                if (count($voucher) < 12) {
-                    continue;
-                }
-                $voucher_id = $voucher[0];
-                $voucher_id = str_replace("\n", '', $voucher_id);
-                $advertiserId = $voucher[1];
-                $code = $voucher[7];
-                if ($voucher_id == "Voucher ID" || !is_numeric($advertiserId) || $code == "Code") {
-                    continue;
-                }
-                $starts = $voucher[4];
-                $ends = $voucher[5];
-                $deeplink_tracking = $voucher[6];
-                $description = $voucher[11];
-                $discount = abs((int)$voucher[8]);
-                $is_percentage = (bool)(strpos($voucher[8], '%') !== false);
-
-                if ($merchantID > 0) {
-                    if ($advertiserId != $merchantID) {
+                    if (count($voucher) < 12) {
                         continue;
                     }
-                }
+                    $voucher_id = $voucher[0];
+                    $voucher_id = str_replace("\n", '', $voucher_id);
+                    $advertiserId = $voucher[1];
+                    $code = $voucher[7];
+                    if ($voucher_id == "Voucher ID" || !is_numeric($advertiserId) || $code == "Code") {
+                        continue;
+                    }
+                    $starts = $voucher[4];
+                    $ends = $voucher[5];
+                    $deeplink_tracking = $voucher[6];
+                    $description = $voucher[11];
+                    $discount = abs((int)$voucher[8]);
+                    $is_percentage = (bool)(strpos($voucher[8], '%') !== false);
 
-                $Deal = Deal::createInstance();
-                $Deal->deal_ID = $voucher_id;
-                $Deal->merchant_ID = $advertiserId;
-                $Deal->code = $code;
-                $Deal->description = $description;
-                $Deal->start_date = $Deal->convertDate($starts . ' 00:00:00');
-                $Deal->end_date = $Deal->convertDate($ends . ' 23:59:59');
-                $Deal->default_track_uri = $deeplink_tracking;
-                $Deal->is_exclusive = false;
-                $Deal->discount_amount = $discount;
-                $Deal->is_percentage = $is_percentage;
-                $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
-                $arrResult[] = $Deal;
+                    if ($merchantID > 0) {
+                        if ($advertiserId != $merchantID) {
+                            continue;
+                        }
+                    }
+
+                    $Deal = Deal::createInstance();
+                    $Deal->deal_ID = $voucher_id;
+                    $Deal->merchant_ID = $advertiserId;
+                    $Deal->code = $code;
+                    $Deal->description = $description;
+                    $Deal->start_date = $Deal->convertDate($starts . ' 00:00:00');
+                    $Deal->end_date = $Deal->convertDate($ends . ' 23:59:59');
+                    $Deal->default_track_uri = $deeplink_tracking;
+                    $Deal->is_exclusive = false;
+                    $Deal->discount_amount = $discount;
+                    $Deal->is_percentage = $is_percentage;
+                    $Deal->deal_type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                    $arrResult[] = $Deal;
+                }
             }
+
         }
         $result->deals[]=$arrResult;
         return $result;
     }
 
-   /**
-	 * @param \DateTime $dateFrom
-	 * @param \DateTime $dateTo
-	 * @param array $arrMerchantID
-	 * @return array of Transaction
-	 * @throws \Exception
-	 */
+    /**
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array $arrMerchantID
+     * @return array of Transaction
+     * @throws \Exception
+     */
     public function getSales(\DateTime $dateFrom, \DateTime $dateTo, array $arrMerchantID = array()) : array
     {
         /*
@@ -171,7 +179,7 @@ class WebGains extends AbstractNetwork implements NetworkInterface
             }
         }
         */
-	    $arrResult = array();
+        $arrResult = array();
         $transactionList = $this->_network->getTransactionList($arrMerchantID, $dateFrom, $dateTo);
         foreach($transactionList as $transaction) {
             $Transaction = Transaction::createInstance();
